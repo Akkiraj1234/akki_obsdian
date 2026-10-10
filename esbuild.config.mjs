@@ -20,7 +20,7 @@ await rm(outputDir, { recursive: true, force: true });
 await mkdir(outputDir, { recursive: true });
 
 await Promise.all([
-    copyFile('src/manifest.json', `${outputDir}/manifest.json`),
+	copyFile('manifest.json', `${outputDir}/manifest.json`),
 	copyFile('LICENSE', `${outputDir}/LICENSE`)
 ]);
 
