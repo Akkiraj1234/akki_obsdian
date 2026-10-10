@@ -12,6 +12,7 @@ jobs:
             contents: write
             id-token: write
             attestations: write
+
         steps:
             - uses: actions/checkout@v6
 
@@ -19,24 +20,21 @@ jobs:
               uses: actions/setup-node@v6
               with:
                   node-version: 24
-                  cache: 'npm'
+                  cache: npm
 
             - name: Build plugin
               run: |
                   npm ci
                   npm run build
 
-            - name: Check for optional styles
-              id: styles
-              run: |
-                  [ -f styles.css ] && echo "exists=true" >> "$GITHUB_OUTPUT" || echo "exists=false" >> "$GITHUB_OUTPUT"
-
             - name: Attest build provenance
               uses: actions/attest@v4
               with:
                   subject-path: |
-                      main.js
-                      ${{ steps.styles.outputs.exists == 'true' && 'styles.css' || '' }}
+                      build/akki-obsidian/main.js
+                      build/akki-obsidian/manifest.json
+                      build/akki-obsidian/styles.css
+                      build/akki-obsidian/LICENSE
 
             - name: Create release
               env:
@@ -47,4 +45,7 @@ jobs:
                   gh release create "$tag" \
                     --title="$tag" \
                     --draft \
-                    main.js manifest.json ${{ steps.styles.outputs.exists == 'true' && 'styles.css' || '' }}
+                    "build/akki-obsidian/main.js" \
+                    "build/akki-obsidian/manifest.json" \
+                    "build/akki-obsidian/styles.css" \
+                    "build/akki-obsidian/LICENSE"
