@@ -51,7 +51,7 @@ jobs:
 
                   gh release create "$tag" \
                     --title="$tag" \
-                    --draft \
+                    --generate-notes \
                     "build/akki-obsidian/main.js" \
                     "build/akki-obsidian/manifest.json" \
                     "build/akki-obsidian/styles.css" \
