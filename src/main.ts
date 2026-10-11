@@ -1,42 +1,17 @@
 import { Plugin } from 'obsidian';
-import {
-	AkkiObsidianSettingTab,
-	AkkiObsidianSettings,
-	DEFAULT_SETTINGS,
-} from './settings';
+import { AkkiObsidianApp } from './core/app';
+import { featureRegistry } from './core/registry';
+import { AkkiObsidianSettingTab } from './settings/settings-tab';
+import { DEFAULT_ROOT_SETTINGS } from './settings/types';
 
 
-class AkkiObsidianPlugin extends Plugin {
-	settings!: AkkiObsidianSettings;
+export default class AkkiObsidianPlugin extends Plugin {
+	private pluginApp!: AkkiObsidianApp;
 
-	async onload() {
-		this.settings = Object.assign(
-			{},
-			DEFAULT_SETTINGS,
-			(await this.loadData()) as Partial<AkkiObsidianSettings>,
-		);
-
-		this.addSettingTab(
-			new AkkiObsidianSettingTab(this.app, this),
-		)
+	async onload(): Promise<void> {
+		this.pluginApp = new AkkiObsidianApp(this, DEFAULT_ROOT_SETTINGS, featureRegistry);
+		await this.pluginApp.loadSettings();
+		await this.pluginApp.initialize();
+		this.addSettingTab(new AkkiObsidianSettingTab(this.app, this.pluginApp));
 	}
-
-	async loadSettings() {
-		// to load setting
-	}
-
-	async saveSettings(): Promise<void> {
-		await this.saveData(this.settings);
-	}
-	
-	onunload() {
-		// what to do when unload
-	}
-
-	onResize() {
-		// what to do on resize
-	}
-	
 }
-
-export default AkkiObsidianPlugin

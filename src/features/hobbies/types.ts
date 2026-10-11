@@ -1,12 +1,11 @@
 export interface HobbiesSettings {
-    dataFilePath: string;
-	showQuickAddButton: boolean;
+	dataFilePath: string;
+	showAddButton: boolean;
 	showQuickTicker: boolean;
 }
 
 export const DEFAULT_HOBBIES_SETTINGS: HobbiesSettings = {
 	dataFilePath: "",
-	showQuickAddButton: true,
+	showAddButton: true,
 	showQuickTicker: true,
 };
-
