@@ -2,29 +2,42 @@ import { Setting } from "obsidian";
 import type { FeatureContext } from "../../core/feature";
 import type { HobbiesSettings } from "./types";
 
+type FolderChangeHandler = (folderPath: string) => Promise<boolean>;
 
 function renderHobbiesSettings(
 	containerEl: HTMLElement,
-	context: FeatureContext<HobbiesSettings>
+	context: FeatureContext<HobbiesSettings>,
+	onFolderChange: FolderChangeHandler,
 ): void 
 {
 	const { settingsConfig, updateSettings } = context;
+	let folderPath = settingsConfig.databaseFolderPath;
 
 	new Setting(containerEl)
-		.setName("DataBase File")
-		.setDesc("path to the hobbies Markdown database inside your vault.")
+		.setName("Database folder")
+		.setDesc("Vault-relative folder for habits.md and one Markdown file per year.")
 		.addText((text) => 
 		text
-			.setPlaceholder("Personal/Hobbies.md")
-			.setValue(settingsConfig.dataFilePath)
+			.setPlaceholder("Habit tracker data")
+			.setValue(folderPath)
 			.onChange(async (value) => {
-				await updateSettings((settings) => { settings.dataFilePath = value.trim(); });
+				folderPath = value.trim();
 			})
+		)
+		.addButton((button) =>
+			button
+				.setButtonText("Save folder")
+				.setCta()
+				.onClick(async () => {
+					if (await onFolderChange(folderPath)) {
+						await updateSettings((settings) => { settings.databaseFolderPath = folderPath; });
+					}
+				}),
 		);
 
 	new Setting(containerEl)
-		.setName("show hobby add button")
-		.setDesc("display the icon on right panel to quicky open a hobby add button and manage button")
+		.setName("Show hobby add button")
+		.setDesc("Display an icon in the right panel to quickly open hobby actions.")
 		.addToggle((toggle) => 
 		toggle
 			.setValue(settingsConfig.showAddButton)
@@ -35,7 +48,7 @@ function renderHobbiesSettings(
 
 	new Setting(containerEl)
 		.setName("Show quick hobbies ticker")
-		.setDesc("display the quck hobbies ticker in left panel.")
+		.setDesc("Display the quick hobby ticker in the left panel.")
 		.addToggle((toggle) => 
 		toggle
 			.setValue(settingsConfig.showQuickTicker)

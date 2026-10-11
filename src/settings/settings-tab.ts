@@ -1,6 +1,6 @@
-
 import { App, PluginSettingTab, Setting } from "obsidian";
 import type { AkkiObsidianApp } from "../core/app";
+
 
 class AkkiObsidianSettingTab extends PluginSettingTab {
 	constructor( app: App, private readonly pluginApp: AkkiObsidianApp ) {
@@ -20,7 +20,7 @@ class AkkiObsidianSettingTab extends PluginSettingTab {
 		});
 
 		headingInfo.createEl("p", {
-			text: "Akki Obsidian Plugin",
+			text: "Akki Obsidian plugin",
 			cls: "setting-item-name",
 		});
 

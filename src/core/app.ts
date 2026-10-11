@@ -1,7 +1,8 @@
 import type { Plugin } from "obsidian";
-import { createFeatureContext } from "./context";
 import type { FeatureDefinition } from "./feature";
-import type { PluginSettings, RootSettings } from "../settings/types";
+import { createFeatureContext } from "./context";
+import { PluginSettings, RootSettings } from "../settings/types";
+
 
 interface RenderableFeature {
 	id: string;
@@ -20,7 +21,36 @@ function mergeFeatureSettings<TSettings extends object>(defaults: TSettings, sav
 	return Object.assign({}, defaults, isRecord(saved) ? saved : {});
 }
 
-export class AkkiObsidianApp {
+/*
+its works is to load setup the app
+load all the features and their settings, 
+*/
+
+class AkkiObsidianApp {
+	readonly features: unknown = [];
+
+	constructor(
+		readonly plugin: Plugin,
+		private readonly feature: readonly unkown[],
+	) {
+		this.feature = feature;
+	}
+
+	async on_load(): Promise<void> {
+
+	}
+
+	async on_unload(): Promise<void> {
+
+	}
+
+	async settings(): Promise<void> {
+
+	}
+}
+
+
+class AkkiObsidianAppv1 {
 	settings: PluginSettings;
 	readonly features: RenderableFeature[] = [];
 
@@ -71,7 +101,9 @@ export class AkkiObsidianApp {
 		if (this.settings.features.hobbies === undefined && isRecord(raw.hobbies)) {
 			this.settings.features.hobbies = {
 				...raw.hobbies,
-				dataFilePath: this.settings.dataFilePath,
+				databaseFolderPath: typeof raw.hobbies.dataFilePath === "string"
+					? raw.hobbies.dataFilePath.replace(/\.[^/.]+$/, "")
+					: "Habit tracker data",
 				showAddButton: typeof raw.hobbies.showQuickAddButton === "boolean" ? raw.hobbies.showQuickAddButton : true,
 			};
 		}
@@ -80,3 +112,5 @@ export class AkkiObsidianApp {
 		}
 	}
 }
+
+export { AkkiObsidianApp, AkkiObsidianAppv1 };
