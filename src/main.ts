@@ -1,33 +1,42 @@
-import { Notice, Plugin } from 'obsidian';
+import { Plugin } from 'obsidian';
 import {
-	AkkiObsidianSettings,
 	AkkiObsidianSettingTab,
+	AkkiObsidianSettings,
 	DEFAULT_SETTINGS,
 } from './settings';
 
-export default class AkkiObsidianPlugin extends Plugin {
+
+class AkkiObsidianPlugin extends Plugin {
 	settings!: AkkiObsidianSettings;
 
 	async onload() {
-		await this.loadSettings();
-		this.addSettingTab(new AkkiObsidianSettingTab(this.app, this));
-
-		this.addCommand({
-			id: 'show-status',
-			name: 'Show task plugin status',
-			callback: () => new Notice('Akki Obsidian is ready.'),
-		});
-	}
-
-	async loadSettings() {
 		this.settings = Object.assign(
 			{},
 			DEFAULT_SETTINGS,
 			(await this.loadData()) as Partial<AkkiObsidianSettings>,
 		);
+
+		this.addSettingTab(
+			new AkkiObsidianSettingTab(this.app, this),
+		)
 	}
 
-	async saveSettings() {
+	async loadSettings() {
+		// to load setting
+	}
+
+	async saveSettings(): Promise<void> {
 		await this.saveData(this.settings);
 	}
+	
+	onunload() {
+		// what to do when unload
+	}
+
+	onResize() {
+		// what to do on resize
+	}
+	
 }
+
+export default AkkiObsidianPlugin
