@@ -2,6 +2,7 @@ import type { FeatureDefinition } from "../../core/feature";
 import { renderHobbiesSettings } from "./settings";
 import { DEFAULT_HOBBIES_SETTINGS, type HobbiesSettings } from "./types";
 
+
 const hobbiesFeature: FeatureDefinition<HobbiesSettings> = {
 	id: "hobbies",
 	name: "Hobbies management",

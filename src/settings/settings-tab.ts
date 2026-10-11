@@ -1,9 +1,9 @@
+
 import { App, PluginSettingTab, Setting } from "obsidian";
 import type { AkkiObsidianApp } from "../core/app";
-import { renderRootSettings } from "./root-settings";
 
-export class AkkiObsidianSettingTab extends PluginSettingTab {
-	constructor(app: App, private readonly pluginApp: AkkiObsidianApp) {
+class AkkiObsidianSettingTab extends PluginSettingTab {
+	constructor( app: App, private readonly pluginApp: AkkiObsidianApp ) {
 		super(app, pluginApp.plugin);
 	}
 
@@ -11,34 +11,71 @@ export class AkkiObsidianSettingTab extends PluginSettingTab {
 		const { containerEl } = this;
 		containerEl.empty();
 
-		new Setting(containerEl)
-			.setName("Akki Obsidian plugin")
-			.setHeading()
-			.settingEl.setAttribute("id", "akki-plugin-definition");
-		containerEl.createEl("p", { text: "A personal workspace and activity management plugin." });
+		const header = containerEl.createDiv({
+			cls: "setting-item akki-settings-header",
+		});
 
-		const navigation = containerEl.createDiv({ cls: "akki-settings-navigation" });
-		const sections = [
-			{ label: "Plugin-wide", id: "root-settings" },
-			...this.pluginApp.features.map((feature) => ({ label: feature.name, id: `feature-${feature.id}` })),
-		];
-		for (const section of sections) {
-			const link = navigation.createEl("a", { text: section.label, href: `#${section.id}` });
+		const headingInfo = header.createDiv({
+			cls: "setting-item-info akki-settings-heading-info",
+		});
+
+		headingInfo.createEl("p", {
+			text: "Akki Obsidian Plugin",
+			cls: "setting-item-name",
+		});
+
+		headingInfo.createEl("p", {
+			text: "A collection of tools to manage life and integrate Obsidian into my daily workflow.",
+			cls: "setting-item-description",
+		});
+
+		const headerItems = header.createDiv({
+			cls: "setting-item-info akki-settings-heading-items",
+		});
+
+		headerItems.createEl("p", {
+			text: "Explore features",
+			cls: "setting-item-name",
+		});
+
+		const navigation = headerItems.createEl("ol", {
+			cls: "akki-settings-navigation",
+		});
+		
+		for (const feature of this.pluginApp.features) {
+			const id = `feature-${feature.id}`;
+
+			const item = navigation.createEl("li");
+			const link = item.createEl("a", {
+				text: feature.name,
+				href: `#${id}`,
+			});
+
 			link.addEventListener("click", (event) => {
 				event.preventDefault();
-				containerEl.querySelector(`#${section.id}`)?.scrollIntoView({ behavior: "smooth" });
+
+				containerEl.querySelector(`#${id}`)?.scrollIntoView({
+					behavior: "smooth",
+					block: "start",
+				});
 			});
 		}
 
-		new Setting(containerEl).setName("Plugin-wide").setHeading().settingEl.setAttribute("id", "root-settings");
-		renderRootSettings(containerEl, {
-			settings: this.pluginApp.settings,
-			save: () => this.pluginApp.saveSettings(),
-		});
-
 		for (const feature of this.pluginApp.features) {
-			new Setting(containerEl).setName(feature.name).setDesc(feature.description).setHeading().settingEl.setAttribute("id", `feature-${feature.id}`);
-			feature.renderSettings(containerEl);
+			const section = containerEl.createDiv({
+				cls: "akki-settings-section",
+			});
+
+			section.id = `feature-${feature.id}`;
+
+			new Setting(section)
+				.setName(feature.name)
+				.setDesc(feature.description)
+				.setHeading();
+
+			feature.renderSettings(section);
 		}
 	}
 }
+
+export { AkkiObsidianSettingTab };

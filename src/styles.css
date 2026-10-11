@@ -1,8 +1,42 @@
-/*
+.setting-item.akki-settings-header {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding: var(--size-4-4);
+    margin-bottom: var(--size-4-4);
+}
 
-This CSS file will be included with your plugin, and
-available in the app when your plugin is enabled.
+.akki-settings-heading-info > .setting-item-name {
+    font-size: var(--h2-size);
+    margin: 0 0 4px;
+}
 
-If your plugin does not need CSS, delete this file.
+.akki-settings-heading-info > .setting-item-description {
+    margin: 0;
+}
 
-*/
+.akki-settings-heading-items {
+    margin-top: var(--size-4-4);
+}
+
+.akki-settings-heading-items > .setting-item-name {
+    margin: 0 0 4px;
+    font-size: var(--font-ui-small);
+}
+
+.akki-settings-navigation {
+    margin: 0;
+    padding-left: var(--size-4-5);
+    font-size: var(--font-ui-small);
+}
+
+.akki-settings-nav-link,
+.akki-settings-nav-link:visited,
+.akki-settings-nav-link:hover {
+    color: var(--text-normal) !important;
+    text-decoration: none;
+}
+
+.akki-settings-nav-link:hover {
+    text-decoration: underline;
+}
