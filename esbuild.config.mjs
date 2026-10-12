@@ -32,6 +32,9 @@ const context = await esbuild.context({
 		main: 'src/main.ts',
 		styles: 'src/styles.css',
 	},
+	alias: {
+		'@': './src',
+	},
 	bundle: true,
 	external: [
 		'obsidian',

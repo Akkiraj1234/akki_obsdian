@@ -1,16 +1,27 @@
-import {Plugin} from 'obsidian';
-import {AkkiObsidianApp} from './core/app';
+import { Plugin } from 'obsidian';
 
+import { AkkiObsidianApp } from './core/app';
+import { AkkiObsidianSettingTab } from './core/settings_tab';
 
 export default class AkkiObsidianPlugin extends Plugin {
-    private PluginApp!: AkkiObsidianApp;
+    private pluginApp!: AkkiObsidianApp;
 
     async onload(): Promise<void> {
-        this.PluginApp = new AkkiObsidianApp(this);
-        await this.PluginApp.on_load();
+        this.pluginApp = new AkkiObsidianApp(this);
+
+        await this.pluginApp.load_settings();
+        await this.pluginApp.load_widgets();
+
+        this.addSettingTab(
+            new AkkiObsidianSettingTab(
+                this.app,
+                this,
+                this.pluginApp,
+            ),
+        );
     }
 
     async onunload(): Promise<void> {
-        this.PluginApp.on_unload();
+        await this.pluginApp.unload_widgets();
     }
 }
