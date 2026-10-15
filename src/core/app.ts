@@ -1,5 +1,6 @@
 import type { Plugin } from 'obsidian';
 import { WIDGETS } from '@/widgets';
+import { MarkDb } from '@/core/markdb/maindb';
 import type {
     WidgetApp,
     WidgetContext,
@@ -33,6 +34,7 @@ class AkkiObsidianApp {
     private settings: RootSettings = { widgets: {} };
     private widgets = new Map<string, WidgetApp>();
     private settingsLoaded = false;
+    private markDb?: MarkDb;
 
     /**
      * Creates the application coordinator and connects it to Obsidian.
@@ -55,9 +57,7 @@ class AkkiObsidianApp {
     async load_settings(): Promise<void> {
         const data: unknown = await this.plugin.loadData();
 
-        const isRecord = (
-            value: unknown,
-        ): value is Record<string, unknown> => {
+        const isRecord = ( value: unknown ): value is Record<string, unknown> => {
             return (
                 typeof value === 'object' &&
                 value !== null &&
@@ -103,9 +103,12 @@ class AkkiObsidianApp {
      * @returns A promise that currently resolves without loading any data.
      */
     async load_markdb(): Promise<void> {
-        if (this.settingsLoaded && typeof this.settings === 'object') {
-            
-        }
+        if (!this.settingsLoaded) await this.load_settings();
+        const hobbySettings = this.settings.widgets.hobby as { storagePath?: unknown } | undefined;
+        const storagePath = typeof hobbySettings?.storagePath === 'string'
+            ? hobbySettings.storagePath
+            : 'akki/hobbies';
+        this.markDb = new MarkDb(this.plugin.app.vault, storagePath);
     }
 
     /**
@@ -117,7 +120,7 @@ class AkkiObsidianApp {
      * @returns A promise that currently resolves without saving any data.
      */
     async save_markdb(): Promise<void> {
-        
+        // MarkDb writes each user action immediately; no cached state to flush.
     }
 
     /**
@@ -182,6 +185,13 @@ class AkkiObsidianApp {
 
                 updater(settings);
 
+                if (definition.id === 'hobby' && this.markDb) {
+                    const hobbySettings = settings as { storagePath?: unknown };
+                    if (typeof hobbySettings.storagePath === 'string') {
+                        this.markDb.setStoragePath(hobbySettings.storagePath);
+                    }
+                }
+
                 await this.save_settings();
 
                 await this.widgets
@@ -189,6 +199,11 @@ class AkkiObsidianApp {
                     ?.on_settings_changed?.();
             },
         };
+    }
+
+    get_markdb(): MarkDb {
+        if (!this.markDb) throw new Error('MarkDB has not been loaded.');
+        return this.markDb;
     }
 }
 

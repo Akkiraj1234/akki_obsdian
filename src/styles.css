@@ -40,3 +40,389 @@
 .akki-settings-nav-link:hover {
     text-decoration: underline;
 }
+
+.akki-hobby-window {
+    width: min(900px, 92vw);
+}
+
+.akki-hobby-window-header,
+.akki-hobby-pane-heading,
+.akki-hobby-row,
+.akki-hobby-row-identity {
+    display: flex;
+    align-items: center;
+}
+
+.akki-hobby-window-header {
+    justify-content: space-between;
+    border-bottom: 1px solid var(--background-modifier-border);
+    margin-bottom: var(--size-4-4);
+}
+
+.akki-hobby-window-header h2 {
+    margin: 0 0 var(--size-4-3);
+}
+
+.akki-hobby-tabs {
+    display: flex;
+    gap: var(--size-4-1);
+}
+
+.akki-hobby-tabs button {
+    border-radius: var(--radius-s) var(--radius-s) 0 0;
+}
+
+.akki-hobby-tabs button.is-active {
+    background: var(--interactive-accent);
+    color: var(--text-on-accent);
+}
+
+.akki-hobby-pane-heading {
+    justify-content: space-between;
+    margin-bottom: var(--size-4-3);
+}
+
+.akki-hobby-pane-title {
+    font-size: var(--h3-size);
+    font-weight: var(--font-semibold);
+}
+
+.akki-hobby-add-button {
+    font-size: 1.5em;
+    line-height: 1;
+}
+
+.akki-hobby-row {
+    border: 1px solid var(--background-modifier-border);
+    border-radius: var(--radius-s);
+    padding: var(--size-4-3);
+    margin: var(--size-4-2) 0;
+}
+
+.akki-hobby-manager-actions,
+.akki-hobby-row,
+.akki-hobby-row-controls {
+    display: flex;
+    gap: var(--size-4-2);
+}
+
+.akki-hobby-manager-actions {
+    margin: var(--size-4-4) 0;
+}
+
+.akki-hobby-row {
+    justify-content: space-between;
+    align-items: center;
+}
+
+.akki-hobby-row small {
+    display: block;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+.akki-hobby-row-identity {
+    gap: var(--size-4-3);
+}
+
+.akki-hobby-id {
+    color: var(--text-muted);
+    font-family: var(--font-monospace);
+    font-size: var(--font-ui-smaller);
+}
+
+.akki-hobby-empty {
+    color: var(--text-muted);
+    text-align: center;
+    padding: var(--size-4-8) var(--size-4-3);
+}
+
+.akki-hobby-save-button {
+    margin-top: var(--size-4-4);
+}
+
+.akki-tracker-hobby-headers {
+    display: flex;
+    gap: var(--size-4-2);
+    overflow-x: auto;
+    padding: var(--size-4-2) 0;
+}
+
+.akki-tracker-hobby-header {
+    display: flex;
+    align-items: center;
+    gap: var(--size-4-1);
+    background: var(--background-secondary);
+    border-radius: var(--radius-s);
+    padding: var(--size-4-2) var(--size-4-3);
+    white-space: nowrap;
+}
+
+.akki-tracker-heatmap {
+    overflow-x: auto;
+    padding: var(--size-4-3) 0;
+}
+
+.akki-tracker-heatmap-row {
+    display: grid;
+    grid-template-columns: 105px max-content;
+    align-items: center;
+    gap: var(--size-4-2);
+    margin: 5px 0;
+}
+
+.akki-tracker-row-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: var(--font-ui-small);
+}
+
+.akki-tracker-cells {
+    display: grid;
+    grid-template-columns: repeat(53, 10px);
+    grid-auto-flow: column;
+    grid-template-rows: repeat(7, 10px);
+    gap: 2px;
+}
+
+.akki-tracker-cell {
+    width: 10px;
+    height: 10px;
+    padding: 0;
+    border: 0;
+    border-radius: 2px;
+    background: var(--background-modifier-border);
+}
+
+.akki-tracker-cell.is-today {
+    outline: 1px solid var(--interactive-accent);
+    outline-offset: 1px;
+}
+
+.akki-tracker-cell.is-complete {
+    background: var(--color-green);
+}
+
+.akki-planner-list {
+    display: grid;
+    gap: var(--size-4-2);
+}
+
+.akki-planner-item {
+    display: flex;
+    gap: var(--size-4-2);
+    align-items: center;
+    padding: var(--size-4-2);
+    border: 1px solid var(--background-modifier-border);
+    border-radius: var(--radius-s);
+}
+
+.akki-github-activity {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: var(--size-4-5);
+}
+
+.akki-github-header,
+.akki-github-row {
+    display: flex;
+    align-items: center;
+}
+
+.akki-github-header {
+    justify-content: space-between;
+    gap: var(--size-4-4);
+    padding-bottom: var(--size-4-4);
+    border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.akki-github-header h2,
+.akki-github-header p {
+    margin: 0;
+}
+
+.akki-github-header p,
+.akki-github-time {
+    color: var(--text-muted);
+    font-size: var(--font-ui-small);
+}
+
+.akki-github-list {
+    margin-top: var(--size-4-3);
+}
+
+.akki-github-row {
+    gap: var(--size-4-3);
+    padding: var(--size-4-3) 0;
+    border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.akki-github-icon {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--background-secondary);
+}
+
+.akki-github-icon.is-push { color: var(--color-green); }
+.akki-github-icon.is-pull-request { color: var(--color-purple); }
+.akki-github-icon.is-issue { color: var(--color-orange); }
+.akki-github-icon.is-star { color: var(--color-yellow); }
+
+.akki-github-details {
+    display: grid;
+    gap: 2px;
+    flex: 1;
+    min-width: 0;
+}
+
+.akki-github-details a {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.akki-github-empty {
+    padding: var(--size-4-8);
+    text-align: center;
+    color: var(--text-muted);
+}
+
+/* GitHub new-tab dashboard */
+.workspace-leaf-content[data-type="akki-github-activity"] .view-content {
+    overflow: auto;
+}
+
+.akki-github-activity {
+    max-width: 840px;
+}
+
+.akki-github-header {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    padding: var(--size-4-4);
+    border: 1px solid var(--background-modifier-border);
+    border-radius: var(--radius-l);
+    background: linear-gradient(135deg, var(--background-secondary), var(--background-primary));
+}
+
+.akki-github-mark,
+.akki-github-action-icon {
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+    color: var(--text-on-accent);
+    background: var(--interactive-accent);
+}
+
+.akki-github-mark {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+}
+
+.akki-github-title h2 {
+    font-size: var(--h3-size);
+}
+
+.akki-github-feed {
+    max-height: 46vh;
+    min-height: 120px;
+    overflow: auto;
+    margin-top: var(--size-4-3);
+    padding: 0 var(--size-4-3);
+    border: 1px solid var(--background-modifier-border);
+    border-radius: var(--radius-m);
+    background: var(--background-primary-alt);
+}
+
+.akki-github-summary {
+    display: flex;
+    gap: var(--size-4-2);
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    padding: var(--size-4-2) 0;
+    background: var(--background-primary-alt);
+    color: var(--text-muted);
+    font-size: var(--font-ui-small);
+}
+
+.akki-github-summary span {
+    padding: 2px var(--size-4-2);
+    border-radius: var(--radius-s);
+    background: var(--background-secondary);
+}
+
+.akki-github-list {
+    margin-top: 0;
+}
+
+.akki-github-actions {
+    margin-top: var(--size-4-4);
+}
+
+.akki-github-actions-title {
+    margin: 0 0 var(--size-4-2);
+    color: var(--text-muted);
+    font-size: var(--font-ui-small);
+}
+
+.akki-github-action-cards {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--size-4-2);
+}
+
+.akki-github-action-card {
+    display: flex;
+    align-items: center;
+    gap: var(--size-4-3);
+    min-width: 0;
+    padding: var(--size-4-3);
+    text-align: left;
+    border: 1px solid var(--background-modifier-border);
+    border-radius: var(--radius-m);
+    background: var(--background-primary-alt);
+}
+
+.akki-github-action-card:hover {
+    border-color: var(--interactive-accent);
+    background: var(--background-secondary);
+}
+
+.akki-github-action-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-s);
+}
+
+.akki-github-action-card span:not(.akki-github-action-icon) {
+    display: grid;
+    gap: 2px;
+    min-width: 0;
+}
+
+.akki-github-action-card small {
+    overflow: hidden;
+    color: var(--text-muted);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+@media (max-width: 500px) {
+    .akki-github-header {
+        grid-template-columns: auto 1fr;
+    }
+
+    .akki-github-header > button {
+        grid-column: 1 / -1;
+    }
+
+    .akki-github-action-cards {
+        grid-template-columns: 1fr;
+    }
+}

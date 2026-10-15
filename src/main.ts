@@ -48,7 +48,11 @@ export default class AkkiObsidianPlugin extends Plugin {
      *
      * @returns A promise that resolves when the shutdown operations complete.
      */
-    async onunload(): Promise<void> {
+    onunload(): void {
+        void this.shutdown();
+    }
+
+    private async shutdown(): Promise<void> {
         await this.pluginApp.save_settings();
         await this.pluginApp.save_markdb();
         await this.pluginApp.unload_widgets();

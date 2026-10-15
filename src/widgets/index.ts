@@ -12,7 +12,8 @@
  * in this collection.
  */
 import type { WidgetDefinition } from '@/core/types';
-import { hobbieTrackerWidget } from './hobbie_tracker/index';
+import { hobbyWidget } from './hobby';
+import { githubActivityWidget } from './new_tab';
 
 
 /**
@@ -21,5 +22,6 @@ import { hobbieTrackerWidget } from './hobbie_tracker/index';
  * This list determines which widgets are available to the application.
  */
 export const WIDGETS: WidgetDefinition[] = [
-    hobbieTrackerWidget
+    hobbyWidget,
+    githubActivityWidget,
 ];

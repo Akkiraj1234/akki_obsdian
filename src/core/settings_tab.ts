@@ -55,7 +55,6 @@ class AkkiObsidianSettingTab extends PluginSettingTab {
         containerEl.empty();
 
         this.renderHeader(containerEl);
-        this.renderWidgetNavigation(containerEl);
         this.renderWidgetSettings(containerEl);
     }
 
@@ -77,7 +76,7 @@ class AkkiObsidianSettingTab extends PluginSettingTab {
         });
 
         headingInfo.createEl('p', {
-            text: 'Akki Obsidian Plugin',
+            text: 'Akki Obsidian plugin',
             cls: 'setting-item-name',
         });
 
@@ -98,6 +97,7 @@ class AkkiObsidianSettingTab extends PluginSettingTab {
      * expose a settings renderer.
      *
      * @param containerEl - The root element of the settings page.
+     * @deprecated
      */
     private renderWidgetNavigation(containerEl: HTMLElement): void {
         const navigationInfo = containerEl.createDiv({
