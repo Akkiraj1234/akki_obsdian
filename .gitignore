@@ -23,3 +23,5 @@ data.json
 
 #ignore all build
 build/
+
+zlast.html
