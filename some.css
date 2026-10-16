@@ -1,0 +1,61 @@
+* {
+    box-sizing: border-box;
+}
+
+:root {
+    --page: #1d1c1a;
+    --outer: #252422;
+    --panel: #403d39;
+    --panel-top: #35322f;
+    --line: #514d47;
+    --text: #f5f0e8;
+    --muted: #b8b2a7;
+    --soft: #8f8980;
+    --coding: #a78bfa;
+    --leetcode: #65a9df;
+    --painting: #e5a06b;
+    --gym: #7eaa91;
+}
+
+body {
+    margin: 0;
+    padding: 24px;
+    background-color: var(--page);
+    color: var(--text);
+    font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont "segoe UI", "sans-serif";
+}
+
+.tracker {
+    display: flex;
+    width: 100%;
+    height: 400px;
+    gap: 10px;
+    padding: 10px;
+    border-radius: 14px;
+    background-color: var(--outer);
+    overflow: hidden;
+}
+
+.labels {
+    flex: 0 0 220px;
+    width: 100%;
+    min-width: 0;
+    padding: 0 12px;
+    background-color: var(--panel);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.timeline {
+    flex: 1;
+    background-color: var(--panel);
+    width: 100%;
+    min-width: 0;
+    border-radius: 10px;
+    padding: 0 12px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    position: relative;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
