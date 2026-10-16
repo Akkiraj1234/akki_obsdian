@@ -1,0 +1,388 @@
+
+* {
+    box-sizing: border-box;
+}
+
+:root {
+    color-scheme: dark;
+
+    --page: #1d1c1a;
+    --outer: #252422;
+    --panel: #302e2b;
+    --panel-hover: #383531;
+    --line: #49453f;
+
+    --text: #f5f0e8;
+    --muted: #b8b2a7;
+    --soft: #8f8980;
+
+    --coding: #b49af7;
+    --leetcode: #78b8e8;
+    --painting: #e5a06b;
+    --gym: #7eaa91;
+    --book-reading: #e5a06b;
+    --sketching: #d98bb5;
+    --chess: #d4bd72;
+    --home-workout: #7eaa91;
+}
+
+body {
+    margin: 0;
+    padding: 24px;
+    background: var(--page);
+    color: var(--text);
+    font-family: Inter, system-ui, -apple-system,
+        BlinkMacSystemFont, "Segoe UI", sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+
+.tracker {
+    display: flex;
+    width: 100%;
+    height: auto;
+    align-items: stretch;
+    gap: 10px;
+    padding: 10px;
+    border: 1px solid #ffffff08;
+    border-radius: 16px;
+    background: var(--outer);
+}
+
+.labels {
+    flex: 0 0 200px;
+    min-width: 0;
+    padding: 0 12px 12px;
+    background: var(--panel);
+    border: 1px solid #ffffff06;
+    border-radius: 12px;
+}
+
+.lable-heading {
+    display: flex;
+    align-items: center;
+    height: 45px;
+    margin: 0;
+    padding: 0 5px;
+    color: var(--text);
+    font-size: 15px;
+    font-weight: 650;
+    letter-spacing: -0.025em;
+    border-bottom: 1px solid var(--line);
+}
+
+.label-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.parent-name {
+    margin: 8px 0 3px;
+    color: var(--soft);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.hierarchy-item {
+    min-width: 0;
+}
+
+.hierarchy-children {
+    margin-left: 10px;
+    padding-left: 11px;
+    border-left: 1px solid var(--line);
+}
+
+.lable-row {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    min-width: 0;
+    height: 29px;
+    flex: 0 0 29px;
+    padding: 0 7px;
+    border-radius: 8px;
+    transition: background-color 150ms ease;
+}
+
+.lable-row.depth-1 {
+    padding-left: 18px;
+}
+
+.lable-row.depth-2 {
+    padding-left: 32px;
+}
+
+.label-section-row {
+    display: flex;
+    align-items: center;
+    height: 22px;
+    flex: 0 0 22px;
+    padding-left: 5px;
+    color: var(--soft);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.lable-row:hover {
+    background: var(--panel-hover);
+}
+
+.dot {
+    width: 8px;
+    height: 8px;
+    flex: 0 0 8px;
+    border-radius: 50%;
+}
+
+.dot.coding { background: var(--coding); }
+.dot.leetcode { background: var(--leetcode); }
+.dot.book-reading { background: var(--book-reading); }
+.dot.sketching { background: var(--sketching); }
+.dot.chess { background: var(--chess); }
+.dot.home-workout { background: var(--home-workout); }
+
+.lable-text {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+}
+
+.lable-name {
+    overflow-wrap: anywhere;
+    color: var(--text);
+    font-size: 13px;
+    line-height: 1.4;
+    font-weight: 600;
+}
+
+.lable-category {
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.4;
+}
+
+.lable-text p {
+    margin: 0;
+}
+
+/* The selector is anchored here, outside the horizontally scrolling element. */
+.timeline-viewport {
+    flex: 1;
+    min-width: 0;
+    position: relative;
+}
+
+.timeline {
+    width: 100%;
+    min-width: 0;
+    padding: 0;
+    background: var(--panel);
+    border: 1px solid #ffffff06;
+    border-radius: 12px;
+
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    scroll-behavior: smooth;
+}
+
+.timeline::-webkit-scrollbar {
+    display: none;
+}
+
+/* Header and timeline data travel together */
+.timeline-track {
+    width: max-content;
+    min-width: calc(
+        var(--content-width, 1050px) + var(--tail-width, 0px)
+    );
+}
+
+.timeline-months-row {
+    display: grid;
+    grid-template-columns: repeat(10, 100px);
+    width: 1050px;
+    margin: 0;
+    padding: 0;
+    transition: grid-template-columns 240ms cubic-bezier(0.2, 0.8, 0.2, 1);
+
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 600;
+
+    border-bottom: 1px solid var(--line);
+}
+
+.timeline-months-row > div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 44px;
+
+    border-left: 1px solid var(--line);
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+
+    transition: color 150ms ease, opacity 150ms ease, background-color 150ms ease;
+}
+
+.timeline-months-row > div.selected {
+    color: var(--text);
+    font-weight: 750;
+    background: var(--panel-hover);
+}
+
+.timeline-months-row > div:not(.selected) {
+    color: var(--soft);
+    opacity: 0.58;
+}
+
+/* Timeline activity rows will use the same column widths */
+.timeline-data {
+    display: flex;
+    flex-direction: column;
+    width: 1050px;
+    position: relative;
+}
+
+.timeline-grid {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    pointer-events: none;
+    z-index: 2;
+    transition: grid-template-columns 240ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.timeline-grid-cell {
+    background: rgba(0, 0, 0, 0.2);
+    border-left: 1px solid var(--line);
+    transition: background-color 240ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.timeline-grid-cell.selected {
+    background: rgba(255, 255, 255, 0.035);
+}
+
+.timeline-activity-row {
+    display: grid;
+    grid-template-columns: repeat(10, 100px);
+    width: 1050px;
+    min-height: 29px;
+    border-bottom: 1px solid var(--line);
+}
+
+.timeline-viewport {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+}
+
+.timeline {
+    width: 100%;
+}
+
+/* Match the left-side category heading heights */
+.timeline-section-row {
+    height: 22px;
+    flex: 0 0 22px;
+    position: relative;
+}
+
+/* Each activity gets one timeline row */
+.timeline-activity-row {
+    display: grid;
+    align-items: center;
+    height: 29px;
+    flex: 0 0 29px;
+    position: relative;
+    border-bottom: 1px solid var(--line);
+    transition: grid-template-columns 240ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Continuous activity bars */
+.activity-bar {
+    grid-row: 1;
+    align-self: center;
+    height: 15px;
+    margin: 0 6px;
+    min-width: 0;
+    border-radius: 5px;
+    position: relative;
+    z-index: 1;
+    opacity: 0.9;
+    transition: opacity 150ms ease;
+}
+
+.activity-bar:hover {
+    opacity: 1;
+}
+
+/* Activity colors */
+.activity-bar.coding {
+    background: var(--coding);
+}
+
+.activity-bar.leetcode {
+    background: var(--leetcode);
+}
+
+.activity-bar.book-reading {
+    background: var(--book-reading);
+}
+
+.activity-bar.sketching {
+    background: var(--sketching);
+}
+
+.activity-bar.chess {
+    background: var(--chess);
+}
+
+.activity-bar.home-workout {
+    background: var(--home-workout);
+}
+
+
+@media (max-width: 600px) {
+    body {
+        padding: 12px;
+    }
+
+    .tracker {
+        gap: 8px;
+        padding: 8px;
+    }
+
+    .labels {
+        flex-basis: 155px;
+        padding-inline: 8px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .lable-row {
+        transition: none;
+    }
+
+    .timeline {
+        scroll-behavior: auto;
+    }
+
+    .timeline-months-row,
+    .timeline-activity-row,
+    .timeline-grid,
+    .timeline-grid-cell {
+        transition: none;
+    }
+}

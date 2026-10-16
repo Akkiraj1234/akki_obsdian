@@ -1,0 +1,402 @@
+/* ==========================================================================
+   Hobby Planner
+   ========================================================================== */
+
+/* -- Design tokens --------------------------------------------------------- */
+
+:root {
+    color-scheme: dark;
+
+    /* Surfaces */
+    --bg: #1b1a18;
+    --frame: #252422;
+    --panel-top: #34312d;
+    --panel-bottom: #2d2b28;
+    --panel-hover: #3a3733;
+
+    /* Lines */
+    --line: rgb(255 245 230 / 0.1);
+    --edge: rgb(255 255 255 / 0.06);
+    --connector: rgb(255 245 230 / 0.18);
+
+    /* Text */
+    --text: #f5f0e8;
+    --text-faint: #8f8980;
+
+    --accent: #e5a06b;
+
+    /* Geometry (shared by the label side and the timeline side so rows align) */
+    --head-h: 48px;
+    --row-h: 32px;
+    --group-h: 30px;
+    --dot: 8px;
+    --pad: 10px;
+    --indent: 16px;
+    --radius-frame: 18px;
+    --radius-panel: 12px;
+
+    /* Motion */
+    --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+    --fast: 160ms;
+}
+
+/* -- Base ------------------------------------------------------------------ */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100dvh;
+    padding: 24px;
+    background:
+        radial-gradient(900px 400px at 12% -10%, rgb(180 154 247 / 0.07), transparent 60%),
+        radial-gradient(700px 360px at 100% 0%, rgb(229 160 107 / 0.05), transparent 60%),
+        var(--bg);
+    color: var(--text);
+    font: 14px/1.4 Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+
+button {
+    font: inherit;
+    color: inherit;
+}
+
+:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+/* -- Layout ---------------------------------------------------------------- */
+
+.tracker {
+    display: flex;
+    gap: 10px;
+    padding: 10px;
+    border: 1px solid var(--edge);
+    border-radius: var(--radius-frame);
+    background: var(--frame);
+    box-shadow:
+        inset 0 1px 0 rgb(255 255 255 / 0.03),
+        0 24px 60px -24px rgb(0 0 0 / 0.6);
+}
+
+.labels,
+.timeline {
+    border: 1px solid var(--edge);
+    border-radius: var(--radius-panel);
+    background: linear-gradient(180deg, var(--panel-top), var(--panel-bottom));
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.04);
+}
+
+/* -- Labels (left) --------------------------------------------------------- */
+
+.labels {
+    flex: 0 0 200px;
+    min-width: 0;
+    padding: 0 12px 12px;
+}
+
+.labels__title {
+    display: flex;
+    align-items: center;
+    height: var(--head-h);
+    margin: 0;
+    padding: 0 var(--pad);
+    border-bottom: 1px solid var(--line);
+    font-size: 15px;
+    font-weight: 650;
+    letter-spacing: -0.02em;
+}
+
+.group-title {
+    display: flex;
+    align-items: flex-end;
+    height: var(--group-h);
+    margin: 0;
+    padding: 0 var(--pad) 5px;
+    color: var(--text-faint);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.label-row {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    height: var(--row-h);
+    padding: 0 var(--pad) 0 calc(var(--pad) + var(--depth, 0) * var(--indent));
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 550;
+    transition: background-color var(--fast) var(--ease-out);
+}
+
+.label-row.is-hovered {
+    background: var(--panel-hover);
+}
+
+.label-row__dot {
+    flex: none;
+    width: var(--dot);
+    height: var(--dot);
+    border-radius: 50%;
+    background: var(--c);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--c) 18%, transparent);
+    transition: box-shadow var(--fast) var(--ease-out);
+}
+
+.label-row.is-hovered .label-row__dot {
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--c) 30%, transparent);
+}
+
+.label-row__name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Tree connector from a parent's dot to its child's dot */
+.label-row.is-child::before {
+    content: "";
+    position: absolute;
+    left: calc(var(--pad) + (var(--depth) - 1) * var(--indent) + var(--dot) / 2);
+    top: calc((var(--dot) - var(--row-h)) / 2);
+    width: calc(var(--indent) - var(--dot) / 2 - 4px);
+    height: calc(var(--row-h) - var(--dot) / 2);
+    border-bottom: 1px solid var(--connector);
+    border-left: 1px solid var(--connector);
+    border-bottom-left-radius: 6px;
+    pointer-events: none;
+}
+
+/* -- Timeline (right) ------------------------------------------------------ */
+
+.timeline {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    touch-action: pan-y;
+    overscroll-behavior: contain;
+}
+
+/*
+ * JS owns two things on the track: its width + translateX, and `--cols`, the
+ * grid template every row shares so columns always line up.
+ */
+.timeline__track {
+    position: relative;
+    will-change: transform;
+}
+
+/* Months header */
+
+.months {
+    display: grid;
+    grid-template-columns: var(--cols);
+    height: var(--head-h);
+    border-bottom: 1px solid var(--line);
+}
+
+.month {
+    --w: 0; /* 0 → 1, how "selected" this column is (set from JS) */
+
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    padding: 0;
+    overflow: hidden;
+    border: 0;
+    background: color-mix(in srgb, var(--panel-hover) calc(var(--w) * 100%), transparent);
+    color: color-mix(in srgb, var(--text) calc(var(--w) * 100%), var(--text-faint));
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: color var(--fast) ease;
+}
+
+.month:not(:first-child) {
+    border-left: 1px solid var(--line);
+}
+
+.month:hover {
+    color: var(--text);
+}
+
+/* The year slides open as the column widens */
+.month__year {
+    display: inline-block;
+    max-width: calc(var(--w) * 3em);
+    margin-left: calc(var(--w) * 6px);
+    overflow: hidden;
+    color: var(--text-faint);
+    font-weight: 500;
+    opacity: var(--w);
+}
+
+/* Accent underline that grows with the selection */
+.month::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 2px;
+    background: var(--accent);
+    transform: scaleX(var(--w));
+    transform-origin: left;
+}
+
+.month:focus-visible {
+    outline-offset: -3px;
+    border-radius: 8px;
+}
+
+/* Rows */
+
+.rows {
+    position: relative;
+}
+
+/* Column lines + dimming of unselected months, drawn above the bars */
+.rows__grid {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: var(--cols);
+    pointer-events: none;
+}
+
+.grid-cell {
+    --w: 0;
+
+    background: color-mix(in srgb, rgb(255 255 255 / 0.035) calc(var(--w) * 100%), rgb(0 0 0 / 0.2));
+}
+
+.grid-cell:not(:first-child) {
+    border-left: 1px solid var(--line);
+}
+
+.group-gap {
+    height: var(--group-h);
+}
+
+.activity-row {
+    display: grid;
+    grid-template-columns: var(--cols);
+    align-items: center;
+    height: var(--row-h);
+    border-bottom: 1px solid var(--line);
+    transition: background-color var(--fast) var(--ease-out);
+}
+
+.activity-row.is-hovered {
+    background: rgb(255 255 255 / 0.025);
+}
+
+/* Activity bars */
+
+.bar {
+    position: relative;
+    z-index: 1;
+    grid-row: 1;
+    min-width: 0;
+    height: 16px;
+    margin-inline: 6px;
+    border-radius: 6px;
+    background: linear-gradient(180deg, color-mix(in srgb, var(--c), white 14%), var(--c));
+    box-shadow:
+        inset 0 1px 0 rgb(255 255 255 / 0.28),
+        0 6px 14px -6px color-mix(in srgb, var(--c) 70%, transparent);
+    transform-origin: left center;
+    transition:
+        opacity 200ms var(--ease-out),
+        filter 200ms var(--ease-out),
+        box-shadow 200ms var(--ease-out);
+}
+
+.bar.is-hovered {
+    filter: brightness(1.1);
+    box-shadow:
+        inset 0 1px 0 rgb(255 255 255 / 0.35),
+        0 8px 20px -6px color-mix(in srgb, var(--c) 90%, transparent);
+}
+
+/* Hovering one activity softly dims the others */
+.is-hovering .bar:not(.is-hovered) {
+    opacity: 0.4;
+}
+
+/* -- Entrance animations --------------------------------------------------- */
+
+.group-title,
+.label-row {
+    animation: slide-in 500ms var(--ease-out) backwards;
+    animation-delay: calc(var(--i) * 40ms);
+}
+
+.bar {
+    animation: grow-in 700ms var(--ease-out) backwards;
+    animation-delay: calc(var(--i) * 60ms + 200ms);
+}
+
+@keyframes slide-in {
+    from {
+        opacity: 0;
+        transform: translateX(-8px);
+    }
+}
+
+@keyframes grow-in {
+    from {
+        opacity: 0;
+        transform: scaleX(0);
+    }
+}
+
+/* -- Responsive ------------------------------------------------------------ */
+
+@media (max-width: 600px) {
+    :root {
+        --pad: 8px;
+    }
+
+    body {
+        padding: 12px;
+    }
+
+    .tracker {
+        gap: 8px;
+        padding: 8px;
+    }
+
+    .labels {
+        flex-basis: 144px;
+        padding-inline: 8px;
+    }
+}
+
+/* -- Reduced motion -------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-delay: 0ms !important;
+    }
+}

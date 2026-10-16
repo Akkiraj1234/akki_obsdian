@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Hobby Planner</title>
+    <link rel="stylesheet" href="hobby-planner.css">
+    <script src="hobby-planner.js" defer></script>
+</head>
+
+<body>
+    <main class="tracker" id="tracker">
+        <!-- Left: section titles and one label per activity (built by JS) -->
+        <aside class="labels" aria-label="Activities">
+            <h1 class="labels__title">Hobby Planner</h1>
+            <div class="labels__list" id="labelList"></div>
+        </aside>
+        
+        <!-- Right: months header + one bar row per activity (built by JS) -->
+        <section class="timeline" id="timeline" aria-label="Activity timeline">
+            <div class="timeline__track" id="track">
+                <div class="months" id="months" role="group" aria-label="Choose a month"></div>
+
+                <div class="rows" id="rows">
+                    <div class="rows__grid" id="grid" aria-hidden="true"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+</body>
+
+</html>
