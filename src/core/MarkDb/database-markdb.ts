@@ -1,0 +1,7 @@
+class DatabaseMarkDB{
+
+}
+
+export {
+    DatabaseMarkDB,
+}

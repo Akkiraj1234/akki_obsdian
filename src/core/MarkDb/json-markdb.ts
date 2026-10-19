@@ -1,0 +1,5 @@
+class JsonMarkDB {
+
+}
+
+export { JsonMarkDB }
