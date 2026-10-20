@@ -1,86 +1,115 @@
-import type { App, DataAdapter, Vault } from "obsidian";
-
-import { normalizeMarkDBPath, resolveAdapter } from "./helper"
-import { MarkDBStorageContext, MarkDBInvalidPathError } from "./types"
-import type { MarkDBOptions, RecordSchema } from "./types";
+import { assertRegularFile, normalizeMarkDBPath, readContents, resolveAdapter, writeContents } from "./helper"
+import { MarkDBStorageContext, MarkDBInvalidPathError, MarkDBSchemaError, MarkDBError, MarkDBFormatMismatchError, MarkDBFileNotFoundError } from "./types"
+import type { RecordSchema, MarkDBFormat } from "./types";
+import { markDBRegistry } from "./registry"
+import { parseHeader } from "./parser";
 
 import { JsonMarkDB } from "./json-markdb";
 import { DatabaseMarkDB } from "./database-markdb";
 import { FileMarkDB } from "./file-markdb";
+import { registry } from "zod/v4/core";
+
+
+
+type MarkDBInstance = JsonMarkDB | DatabaseMarkDB | FileMarkDB;
+export interface MarkDBOptions<T = unknown> {
+    format: MarkDBFormat;
+    create?: boolean;
+    schema?: RecordSchema;
+}
 
 
 /**
- * Opens a JSON MarkDB file.
+ * Creates the initial contents for a new MarkDB file.
  *
- * @param context - The Obsidian application, vault, or data adapter.
- * @param path - The vault-relative path to the MarkDB file.
- * @param options - Configuration options specifying the JSON format.
- * @returns The opened JSON MarkDB instance.
+ * The file header records its format so that opening the file
+ * later can verify that the requested format matches.
  */
-async function openMarkDB(
+function makeInitialContents(
+    format: MarkDBOptions["format"],
+    blockSize: number,
+): string {
+    if (format === "json") {
+        return makeHeader(format) + "null\n";
+    }
+
+    if (format === "database") {
+        return makeHeader(format) + makeDatabaseBody([]);
+    }
+
+    return makeHeader(format) + makeFileBody(blockSize);
+}
+
+
+
+/**
+ * Opens an existing JSON MarkDB file or creates it when permitted.
+ *
+ * @param context Storage context used to access the file.
+ * @param path Path to the MarkDB file.
+ * @param options Opening and creation options.
+ * @returns An initialized JSON MarkDB instance.
+ * @throws MarkDBInvalidPathError If the path is invalid.
+ * @throws MarkDBFileNotFoundError If the file is missing and creation is disabled.
+ * @throws MarkDBFormatMismatchError If the existing file uses another format.
+ */
+function openMarkDB(
     context: MarkDBStorageContext,
     path: string,
-    options: MarkDBOptions & {
-        format: "json";
-    },
+    options: MarkDBOptions & { format: "json" },
 ): Promise<JsonMarkDB>;
 
 /**
- * Opens a database MarkDB file.
+ * Opens an existing database MarkDB file or creates it when permitted.
  *
- * @param context - The Obsidian application, vault, or data adapter.
- * @param path - The vault-relative path to the MarkDB file.
- * @param options - Configuration options specifying the database format and record schema.
- * @returns The opened database MarkDB instance.
+ * A record schema is mandatory for this format.
+ *
+ * @param context Storage context used to access the file.
+ * @param path Path to the MarkDB file.
+ * @param options Database options, including the record schema.
+ * @returns An initialized Database MarkDB instance.
  */
-async function openMarkDB(
+function openMarkDB(
     context: MarkDBStorageContext,
     path: string,
-    options: MarkDBOptions & {
-        format: "database";
-        schema: RecordSchema;
-    },
+    options: MarkDBOptions & { format: "database"; schema: RecordSchema },
 ): Promise<DatabaseMarkDB>;
 
 /**
- * Opens a file MarkDB file.
+ * Opens an existing file MarkDB file or creates it when permitted.
  *
- * @param context - The Obsidian application, vault, or data adapter.
- * @param path - The vault-relative path to the MarkDB file.
- * @param options - Configuration options specifying the file format.
- * @returns The opened file MarkDB instance.
+ * @param context Storage context used to access the file.
+ * @param path Path to the MarkDB file.
+ * @param options Opening and creation options.
+ * @returns An initialized File MarkDB instance.
  */
-async function openMarkDB(
+function openMarkDB(
     context: MarkDBStorageContext,
     path: string,
-    options: MarkDBOptions & {
-        format: "file";
-    },
+    options: MarkDBOptions & { format: "file" },
 ): Promise<FileMarkDB>;
 
+
 /**
- * Opens a MarkDB file using the specified format.
+ * Opens or creates a MarkDB file.
  *
- * Resolves the Obsidian storage adapter, normalizes the file path, and checks
- * whether the file exists. If the file does not exist, it creates the file
- * when creation is allowed; otherwise, it throws an error.
+ * Opening follows this sequence:
  *
- * Validates that the path points to a regular file and that its declared
- * format matches the requested format. It then validates the file's contents
- * and checks its health before returning the corresponding MarkDB instance.
+ * 1. Validate the supplied arguments and format-specific options.
+ * 2. Resolve the storage adapter and normalize the path.
+ * 3. Reuse a compatible instance if the file is already open.
+ * 4. Create the file when it is missing and creation is enabled.
+ * 5. Verify that the target is a regular file.
+ * 6. Read and validate its header and requested format.
+ * 7. Construct the appropriate implementation.
+ * 8. Check the instance's health before registering it.
  *
- * If an instance for the same file is already registered, the existing
- * instance is returned instead of creating a duplicate.
+ * The registry contains only successfully initialized instances.
  *
- * @param context - The Obsidian application, vault, or data adapter used for storage.
- * @param path - The vault-relative path to the MarkDB file.
- * @param options - Configuration specifying the file format, creation behavior,
- *                  and any format-specific options.
- * @returns The validated MarkDB instance matching the requested format.
- * @throws {MarkDBInvalidPathError} If the file path is invalid.
- * @throws {MarkDBFileNotFoundError} If the file does not exist and creation is disabled.
- * @throws {MarkDBFormatMismatchError} If the existing file's format differs from the requested format.
- * @throws {MarkDBCorruptionError} If the file's contents or metadata are invalid.
+ * @param context Storage context used to access the file.
+ * @param path Path to the MarkDB file.
+ * @param options Opening and creation options.
+ * @returns The initialized MarkDB instance matching the requested format.
  */
 async function openMarkDB(
     context: MarkDBStorageContext,
@@ -88,30 +117,107 @@ async function openMarkDB(
     options: MarkDBOptions,
 ): Promise<JsonMarkDB | DatabaseMarkDB | FileMarkDB> {
 
-    const adapter = resolveAdapter(context)
+    // 1. Validate arguments.
+    if (!context || typeof context !== "object") {
+        throw new MarkDBInvalidPathError(
+            "A valid MarkDB storage context is required."
+        );
+    }
+
+    if (typeof path !== "string" || path.trim() === "") {
+        throw new MarkDBInvalidPathError(
+            "A non-empty MarkDB path is required.",
+        );
+    }
+
+    if (!options || typeof options !== "object") {
+        throw new MarkDBError(
+            "MarkDB options are required.",
+        );
+    }
+
+    if (
+        options.format !== "json" &&
+        options.format !== "database" &&
+        options.format !== "file"
+    ) {
+        throw new MarkDBError(
+            `Unsupported MarkDB format: ${String(options.format)}`,
+        );
+    }
+
+    // 2. Resolve the adapter and normalize the path.
+    const adapter = resolveAdapter(context);
     const resolved_path = normalizeMarkDBPath(path);
 
-    // we should check if file have some prefix or not if not then try to look with ".mdb"
     if (!resolved_path.endsWith(".mdb")) {
         throw new MarkDBInvalidPathError(
             `MarkDB files must use the .mdb extension: ${path}`,
             path
         )
+    } 
+
+    // 3. Reuse an instance already opened for this context and path.
+    const existing = markDBRegistry.get(resolved_path);
+
+    if (existing) {
+        const matchesFormat = 
+            (options.format === "json" && existing instanceof JsonMarkDB) ||
+            (options.format === "database" && existing instanceof DatabaseMarkDB) ||
+            (options.format === "file" && existing instanceof FileMarkDB);
+
+        if (!matchesFormat) {
+            throw new MarkDBFormatMismatchError(
+                `The requested format "${options.format}" does not match the already-open instance.`
+            );
+        }
+        return existing;
     }
 
-    // 2. check if file path instance already exists or not
+    // 4. Create a missing file only when explicitly allowed.
+    const exist = await adapter.exists(resolved_path);
 
-    if (options.format === "database" && !options.schema) {
-        throw new MarkDBSchemaError(
-            "A Zod schema is required for database files.",
-            path,
+    if (!exist) {
+        if (options.create !== true) {
+            throw new MarkDBFileNotFoundError(
+                `MarkDB file not found: ${resolvedPath}`,
+            );
+        }
+
+        await writeContents(
+            adapter,
+            resolved_path,
+            makeInitialContents(options.format)
+        )
+    }
+
+    // 5. Ensure the target is a regular file.
+    // 6. Read the file and validate its header.
+    await assertRegularFile(adapter, resolved_path);
+    const content = await readContents(adapter, resolved_path);
+    const { header } = parseHeader(content);
+
+    if (header.format !== options.format) {
+        throw new MarkDBFormatMismatchError(
+            `Expected format "${options.format}", but found "${header.format}" in "${resolvedPath}".`,
         );
     }
-    
-    if (
-        options.format === "file" && 
-        ()
-    )
+
+    // 7. Construct the implementation for the requested format.
+    let instance: MarkDBInstance;
+
+    if (options.format === "json") {
+        instance = new JsonMarkDB(adapter, resolved_path);
+    } else if (options.format === "database") {
+        instance = new DatabaseMarkDB(adapter, resolved_path, options.schema!);
+    } else {
+        instance = new FileMarkDB(adapter, resolved_path);
+    }
+
+    // 8. Register only after initialization succeeds.
+    await instance.checkHealth();
+    registry.set(resolved_path, instance);
+    return instance;    
 }
 
 export { openMarkDB };
