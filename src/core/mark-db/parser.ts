@@ -1,4 +1,4 @@
-import { MarkDBIncompatibleVersionError, MarkDBInvalidHeaderError } from "./types";
+import { MarkDBIncompatibleVersionError, MarkDBInvalidHeaderError } from "./error";
 import type { MarkDBFormat, MarkDBHeader } from "./types";
 
 /**
@@ -51,7 +51,7 @@ function parseHeader( contents: string ): { header: MarkDBHeader; body: string }
 
 	if (!match) {
 		throw new MarkDBInvalidHeaderError(
-			"Invalid MarkDB header. Expected '<!-- markdb: v1; type: json|database|file -->'.",
+			"Invalid MarkDB header. Expected '<!-- markdb: vN; type: json|database|file -->'.",
 		);
 	}
 

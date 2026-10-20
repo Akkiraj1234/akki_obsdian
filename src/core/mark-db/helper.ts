@@ -1,9 +1,6 @@
+import {MarkDBInvalidPathError, MarkDBFileNotFoundError} from "./error"
+import type { MarkDBStorageContext } from "./types";
 import type { DataAdapter } from "obsidian";
-import { 
-    MarkDBInvalidPathError, 
-    MarkDBFileNotFoundError,
-    type MarkDBStorageContext,
-} from "./types";
 
 
 /**

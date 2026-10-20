@@ -1,5 +1,3 @@
-import type { MarkDBFormat } from "./types";
-
 /**
  * MarkDB Instance Registry
  *
@@ -12,6 +10,7 @@ import type { MarkDBFormat } from "./types";
  * The registry is shared across the module to prevent duplicate
  * registrations and allow consistent access to opened instances.
  */
+import type { MarkDBFormat } from "./types";
 
 type MarkDBInstance = object;
 interface RegistryEntry {

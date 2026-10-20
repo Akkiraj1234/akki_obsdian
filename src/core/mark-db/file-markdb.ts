@@ -1,7 +1,0 @@
-class FileMarkDB{
-
-}
-
-export {
-    FileMarkDB,
-}

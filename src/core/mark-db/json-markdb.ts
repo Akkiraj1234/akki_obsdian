@@ -1,5 +1,0 @@
-class JsonMarkDB {
-
-}
-
-export { JsonMarkDB }
