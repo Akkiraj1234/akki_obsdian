@@ -1,299 +1,98 @@
-// import { DatabaseMarkDB, makeDatabaseBody } from "./databasemarkdb";
-// import { DEFAULT_BLOCK_SIZE, FileMarkDB, makeFileBody } from "./filemarkdb";
-// import { JsonMarkDB } from "./jsonmarkdb";
-// import { makeHeader, parseHeader } from "./parser";
-// import {
-// 	assertRegularFile,
-// 	normalizeMarkDBPath,
-// 	readContents,
-// 	resolveAdapter,
-// 	writeContents,
-// } from "./storage";
-// import {
-// 	MarkDBCorruptionError,
-// 	MarkDBFileNotFoundError,
-// 	MarkDBFormatMismatchError,
-// 	MarkDBInvalidPathError,
-// 	MarkDBSchemaError,
-// } from "./types";
-// import type {
-// 	MarkDBOptions,
-// 	MarkDBStorageContext,
-// 	RecordSchema,
-// } from "./types";
-
-
-
-
-
-
-// export class MarkDB {
-// 	static async open(
-// 		context: MarkDBStorageContext,
-// 		path: string,
-// 		options: MarkDBOptions & { format: "json" },
-// 	): Promise<JsonMarkDB>;
-
-// 	static async open<T>(
-// 		context: MarkDBStorageContext,
-// 		path: string,
-// 		options: MarkDBOptions<T> & {
-// 			format: "database";
-// 			schema: RecordSchema<T>;
-// 		},
-// 	): Promise<DatabaseMarkDB<T>>;
-
-// 	static async open(
-// 		context: MarkDBStorageContext,
-// 		path: string,
-// 		options: MarkDBOptions & { format: "file" },
-// 	): Promise<FileMarkDB>;
-
-// 	static async open<T>(
-// 		context: MarkDBStorageContext,
-// 		requestedPath: string,
-// 		options: MarkDBOptions<T>,
-// 	): Promise<JsonMarkDB | DatabaseMarkDB<T> | FileMarkDB> {
-// 		const adapter = resolveAdapter(context);
-// 		const path = normalizeMarkDBPath(requestedPath);
-
-// 		if (!path.endsWith(".mdb")) {
-// 			throw new MarkDBInvalidPathError(
-// 				`MarkDB files must use the .mdb extension: ${path}`,
-// 				path,
-// 			);
-// 		}
-
-// 		if (options.format === "database" && !options.schema) {
-// 			throw new MarkDBSchemaError(
-// 				"A Zod schema is required for database files.",
-// 				path,
-// 			);
-// 		}
-
-// 		const blockSize = options.blockSize ?? DEFAULT_BLOCK_SIZE;
-
-// 		if (
-// 			options.format === "file" &&
-// 			(!Number.isSafeInteger(blockSize) || blockSize <= 0)
-// 		) {
-// 			throw new MarkDBCorruptionError(
-// 				"Block size must be a positive integer.",
-// 				path,
-// 			);
-// 		}
-
-// 		if (!(await adapter.exists(path))) {
-// 			if (!options.create) {
-// 				throw new MarkDBFileNotFoundError(
-// 					`MarkDB file does not exist: ${path}`,
-// 					path,
-// 				);
-// 			}
-
-// 			await writeContents(
-// 				adapter,
-// 				path,
-// 				makeInitialContents(options.format, blockSize),
-// 			);
-// 		}
-
-// 		await assertRegularFile(adapter, path);
-
-// 		const contents = await readContents(adapter, path);
-// 		const { header } = parseHeader(contents);
-
-// 		if (header.format !== options.format) {
-// 			throw new MarkDBFormatMismatchError(
-// 				`Expected ${options.format} MarkDB file, found ${header.format}.`,
-// 				path,
-// 			);
-// 		}
-
-// 		let database: JsonMarkDB | DatabaseMarkDB<T> | FileMarkDB;
-
-// 		if (options.format === "json") {
-// 			database = new JsonMarkDB(adapter, path);
-// 		} else if (options.format === "database") {
-// 			database = new DatabaseMarkDB(
-// 				adapter,
-// 				path,
-// 				options.schema as RecordSchema<T>,
-// 			);
-// 		} else {
-// 			database = new FileMarkDB(adapter, path, blockSize);
-// 		}
-
-// 		await database.checkHealth();
-
-// 		return database;
-// 	}
-// }
-
-// function makeInitialContents(
-// 	format: MarkDBOptions["format"],
-// 	blockSize: number,
-// ): string {
-// 	if (format === "json") {
-// 		return makeHeader(format) + "null\n";
-// 	}
-
-// 	if (format === "database") {
-// 		return makeHeader(format) + makeDatabaseBody([]);
-// 	}
-
-// 	return makeHeader(format) + makeFileBody(blockSize);
-// }
-
-
-
-import {
-    assertRegularFile,
-    normalizeMarkDBPath,
-    readContents,
-    resolveAdapter,
-    writeContents,
-} from "./helper";
-
-import {
-    MarkDBError,
-    MarkDBFileNotFoundError,
-    MarkDBFormatMismatchError,
-    MarkDBInvalidPathError,
-    MarkDBSchemaError,
-    MarkDBStorageContext,
-} from "./types";
-
-import type {
-    MarkDBFormat,
-    RecordSchema,
-} from "./types";
-
-import { JsonMarkDB } from "./json-markdb";
-import { DatabaseMarkDB } from "./database-markdb";
-import { FileMarkDB } from "./file-markdb";
-
-import { parseHeader } from "../markdb/parser";
-
 /**
- * Options accepted when opening or creating a MarkDB file.
+ * @file markdb.ts
+ * Provides the public API for opening and creating MarkDB files.
+ *
+ * This module coordinates the lifecycle of a MarkDB instance, from
+ * validating the supplied options and resolving the storage adapter
+ * to initializing and registering the resulting instance.
+ *
+ * The `openMarkDB()` function normalizes file paths, checks the registry
+ * for previously opened instances, and creates new files when explicitly
+ * permitted. Before returning a new instance, it validates the file's
+ * structure and declared format, initializes the appropriate storage
+ * implementation, and verifies its health.
+ *
+ * MarkDB supports three storage formats:
+ * - `json`: Stores data in JSON format.
+ * - `database`: Stores records validated against a defined schema.
+ * - `file`: Stores data using the file-based format.
+ *
+ * Instances are registered only after successful initialization,
+ * allowing subsequent calls to reuse existing instances and avoid
+ * unnecessary reinitialization of the same file.
+ *
+ * @module markdb
  */
+
+import { assertRegularFile, normalizeMarkDBPath, readContents, resolveAdapter, writeContents } from "./helper";
+import { MarkDBError, MarkDBFileNotFoundError, MarkDBFormatMismatchError, MarkDBInvalidPathError, MarkDBSchemaError } from "./error";
+import type { MarkDBFormat, MarkDBStorageContext, RecordSchema } from "./types";
+import { parseHeader, makeHeader } from "./parser";
+import { markDBRegistry } from "./registry";
+
+import { JsonMarkDB, makeJsonBody } from "./markdb-json";
+import { DatabaseMarkDB, makeDatabaseBody } from "./markdb-database";
+import { FileMarkDB, makeFileBody } from "./markdb-file";
+
+
+type MarkDBInstance = JsonMarkDB | DatabaseMarkDB | FileMarkDB;
 export interface MarkDBOptions {
-    /**
-     * Expected file format.
-     *
-     * Existing files must use this format. Newly created files
-     * are initialized using this format.
-     */
     format: MarkDBFormat;
-
-    /**
-     * Whether a missing file may be created.
-     *
-     * Defaults to false.
-     */
     create?: boolean;
-
-    /**
-     * Schema used to validate database records.
-     *
-     * Required when format is "database".
-     */
     schema?: RecordSchema;
 }
 
-/**
- * Represents any supported MarkDB implementation.
- */
-type MarkDBInstance =
-    | JsonMarkDB
-    | DatabaseMarkDB
-    | FileMarkDB;
 
 /**
- * Stores successfully opened instances so repeated calls can
- * reuse an existing instance instead of opening the same file again.
+ * Builds the initial contents of a MarkDB file for the specified format.
  *
- * The key must include the storage context and normalized path.
- * This implementation assumes the context has a stable identity.
- */
-const openInstances = new WeakMap<
-    object,
-    Map<string, MarkDBInstance>
->();
-
-/**
- * Returns the registry associated with a storage context.
- */
-function getRegistry(
-    context: MarkDBStorageContext,
-): Map<string, MarkDBInstance> {
-    const key = context as object;
-
-    let registry = openInstances.get(key);
-
-    if (!registry) {
-        registry = new Map<string, MarkDBInstance>();
-        openInstances.set(key, registry);
-    }
-
-    return registry;
-}
-
-/**
- * Creates the initial contents for a new MarkDB file.
+ * Prepends the format header to the corresponding format-specific body,
+ * ensuring the new file can be identified and validated when opened.
  *
- * The file header records its format so that opening the file
- * later can verify that the requested format matches.
+ * @param format - Storage format to initialize (`json`, `database`, or `file`).
+ * @returns The complete serialized contents of the new MarkDB file.
  */
-function makeInitialContents(format: MarkDBFormat): string {
+function makeInitialContents(format: MarkDBFormat, schema?: RecordSchema): string {
     switch (format) {
-        case "json":
-            return makeHeader(format) + "null\n";
+        case "json": 
+            return makeHeader(format) + makeJsonBody({});
 
-        case "database":
-            return makeHeader(format) + makeDatabaseBody([]);
-
-        case "file":
-            return makeHeader(format) + makeFileBody();
-
-        default: {
-            const unsupported: never = format;
-            throw new MarkDBError(
-                `Unsupported MarkDB format: ${unsupported}`,
-            );
-        }
+        case "database": 
+            return makeHeader(format) + makeDatabaseBody([], schema);
+            
+        case "file": 
+            return makeHeader(format) + makeFileBody("");
     }
 }
 
 /**
- * Opens an existing JSON MarkDB file or creates it when permitted.
+ * Opens a JSON-format MarkDB file or creates one if it does not exist
+ * and creation is enabled.
  *
- * @param context Storage context used to access the file.
- * @param path Path to the MarkDB file.
- * @param options Opening and creation options.
- * @returns An initialized JSON MarkDB instance.
- * @throws MarkDBInvalidPathError If the path is invalid.
- * @throws MarkDBFileNotFoundError If the file is missing and creation is disabled.
- * @throws MarkDBFormatMismatchError If the existing file uses another format.
+ * @param context - Storage context used to access the file.
+ * @param path - Path to the MarkDB file.
+ * @param options - Opening options with `format` set to `"json"`.
+ * @returns A promise that resolves to an initialized `JsonMarkDB` instance.
  */
-export function openMarkDB(
+function openMarkDB(
     context: MarkDBStorageContext,
     path: string,
     options: MarkDBOptions & { format: "json" },
 ): Promise<JsonMarkDB>;
 
 /**
- * Opens an existing database MarkDB file or creates it when permitted.
+ * Opens a database-format MarkDB file or creates one if it does not
+ * exist and creation is enabled.
  *
- * A record schema is mandatory for this format.
+ * A record schema is required to validate records stored in this format.
  *
- * @param context Storage context used to access the file.
- * @param path Path to the MarkDB file.
- * @param options Database options, including the record schema.
- * @returns An initialized Database MarkDB instance.
+ * @param context - Storage context used to access the file.
+ * @param path - Path to the MarkDB file.
+ * @param options - Opening options with `format` set to `"database"`
+ * and the required record schema.
+ * @returns A promise that resolves to an initialized `DatabaseMarkDB` instance.
  */
-export function openMarkDB(
+function openMarkDB(
     context: MarkDBStorageContext,
     path: string,
     options: MarkDBOptions & {
@@ -303,46 +102,46 @@ export function openMarkDB(
 ): Promise<DatabaseMarkDB>;
 
 /**
- * Opens an existing file MarkDB file or creates it when permitted.
+ * Opens a file-format MarkDB file or creates one if it does not exist
+ * and creation is enabled.
  *
- * @param context Storage context used to access the file.
- * @param path Path to the MarkDB file.
- * @param options Opening and creation options.
- * @returns An initialized File MarkDB instance.
+ * @param context - Storage context used to access the file.
+ * @param path - Path to the MarkDB file.
+ * @param options - Opening options with `format` set to `"file"`.
+ * @returns A promise that resolves to an initialized `FileMarkDB` instance.
  */
-export function openMarkDB(
+function openMarkDB(
     context: MarkDBStorageContext,
     path: string,
     options: MarkDBOptions & { format: "file" },
 ): Promise<FileMarkDB>;
 
 /**
- * Opens or creates a MarkDB file.
+ * Opens a MarkDB file or creates it if it does not exist and creation is enabled.
  *
- * Opening follows this sequence:
+ * Validates the supplied options and path, resolves the storage adapter,
+ * and checks the registry for an existing instance. If no instance is
+ * registered, it creates the file when permitted, validates its header
+ * and format, initializes the corresponding implementation, and checks
+ * its health before registering it.
  *
- * 1. Validate the supplied arguments and format-specific options.
- * 2. Resolve the storage adapter and normalize the path.
- * 3. Reuse a compatible instance if the file is already open.
- * 4. Create the file when it is missing and creation is enabled.
- * 5. Verify that the target is a regular file.
- * 6. Read and validate its header and requested format.
- * 7. Construct the appropriate implementation.
- * 8. Check the instance's health before registering it.
+ * @param context - Storage context used to access the file.
+ * @param path - Path to the MarkDB file; must use the `.mdb` extension.
+ * @param options - Options specifying the format, creation behavior, and optional schema.
+ * @returns A promise resolving to the initialized MarkDB instance.
  *
- * The registry contains only successfully initialized instances.
- *
- * @param context Storage context used to access the file.
- * @param path Path to the MarkDB file.
- * @param options Opening and creation options.
- * @returns The initialized MarkDB instance matching the requested format.
+ * @throws {MarkDBInvalidPathError} If the path or storage context is invalid.
+ * @throws {MarkDBFileNotFoundError} If the file does not exist and creation is disabled.
+ * @throws {MarkDBFormatMismatchError} If the existing file format differs from the requested format.
+ * @throws {MarkDBSchemaError} If the `database` format is selected without a schema.
+ * @throws {MarkDBError} If the options are missing or the requested format is unsupported.
  */
-export async function openMarkDB(
+async function openMarkDB(
     context: MarkDBStorageContext,
     path: string,
     options: MarkDBOptions,
 ): Promise<MarkDBInstance> {
-    // 1. Validate arguments.
+    // Validate the supplied arguments.
     if (!context || typeof context !== "object") {
         throw new MarkDBInvalidPathError(
             "A valid MarkDB storage context is required.",
@@ -356,9 +155,7 @@ export async function openMarkDB(
     }
 
     if (!options || typeof options !== "object") {
-        throw new MarkDBError(
-            "MarkDB options are required.",
-        );
+        throw new MarkDBError("MarkDB options are required.");
     }
 
     if (
@@ -371,28 +168,25 @@ export async function openMarkDB(
         );
     }
 
-    if (
-        options.format === "database" &&
-        !options.schema
-    ) {
+    if (options.format === "database" && !options.schema) {
         throw new MarkDBSchemaError(
             'The "database" format requires a record schema.',
         );
     }
 
-    // 2. Resolve the adapter and normalize the path.
+    // Resolve the adapter and normalize the path.
     const adapter = resolveAdapter(context);
     const resolvedPath = normalizeMarkDBPath(path);
 
     if (!resolvedPath.endsWith(".mdb")) {
         throw new MarkDBInvalidPathError(
-            'MarkDB paths must end with ".mdb".',
+            `MarkDB files must use the .mdb extension: ${path}`,
+            path,
         );
     }
 
-    // 3. Reuse an instance already opened for this context and path.
-    const registry = getRegistry(context);
-    const existing = registry.get(resolvedPath);
+    // Reuse an existing instance when its format matches.
+    const existing = markDBRegistry.get(resolvedPath);
 
     if (existing) {
         const matchesFormat =
@@ -412,7 +206,7 @@ export async function openMarkDB(
         return existing;
     }
 
-    // 4. Create a missing file only when explicitly allowed.
+    // Create the file only when explicitly permitted.
     const exists = await adapter.exists(resolvedPath);
 
     if (!exists) {
@@ -425,14 +219,12 @@ export async function openMarkDB(
         await writeContents(
             adapter,
             resolvedPath,
-            makeInitialContents(options.format),
+            makeInitialContents(options.format, options.schema),
         );
     }
 
-    // 5. Ensure the target is a regular file.
+    // Validate the file and its declared format.
     await assertRegularFile(adapter, resolvedPath);
-
-    // 6. Read the file and validate its header.
     const contents = await readContents(adapter, resolvedPath);
     const { header } = parseHeader(contents);
 
@@ -442,30 +234,23 @@ export async function openMarkDB(
         );
     }
 
-    // 7. Construct the implementation for the requested format.
+    // Construct the implementation for the requested format.
     let instance: MarkDBInstance;
+    
+    if (options.format === "json") {
+        instance = new JsonMarkDB(adapter, resolvedPath);
 
-    switch (options.format) {
-        case "json":
-            instance = new JsonMarkDB(adapter, resolvedPath);
-            break;
-
-        case "database":
-            instance = new DatabaseMarkDB(
-                adapter,
-                resolvedPath,
-                options.schema!,
-            );
-            break;
-
-        case "file":
-            instance = new FileMarkDB(adapter, resolvedPath);
-            break;
+    } else if (options.format === "database") {
+        instance = new DatabaseMarkDB(adapter, resolvedPath, options.schema!);
+    
+    } else {
+        instance = new FileMarkDB(adapter, resolvedPath);
     }
 
-    // 8. Register only after initialization succeeds.
+    // Register the instance only after its health check succeeds.
     await instance.checkHealth();
-    registry.set(resolvedPath, instance);
-
+    markDBRegistry.register(resolvedPath, options.format, instance);
     return instance;
 }
+
+export { openMarkDB };
