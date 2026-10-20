@@ -14,9 +14,26 @@ import type { DataAdapter } from "obsidian";
  * @returns The resolved Obsidian data adapter.
  */
 export function resolveAdapter(context: MarkDBStorageContext): DataAdapter {
-    if ("vault" in context) return context.vault.adapter;
-    if ("adapter" in context) return context.adapter;
-    return context;
+    if (!context || typeof context !== "object") {
+        throw new MarkDBInvalidPathError("A valid MarkDB storage context is required.");
+    }
+
+    const adapter = "vault" in context
+        ? context.vault?.adapter
+        : "adapter" in context
+            ? context.adapter
+            : context;
+    if (
+        !adapter ||
+        typeof adapter !== "object" ||
+        typeof adapter.exists !== "function" ||
+        typeof adapter.stat !== "function" ||
+        typeof adapter.read !== "function" ||
+        typeof adapter.write !== "function"
+    ) {
+        throw new MarkDBInvalidPathError("A valid MarkDB storage context is required.");
+    }
+    return adapter;
 }
 
 /**
@@ -38,7 +55,7 @@ export function resolveAdapter(context: MarkDBStorageContext): DataAdapter {
 export function normalizeMarkDBPath(path: string): string {
     const slashPath = path.replace(/\\/g, "/");
 
-    if (!slashPath || slashPath.startsWith("/")) {
+    if (!slashPath || slashPath.startsWith("/") || /^[A-Za-z]:\//.test(slashPath)) {
         throw new MarkDBInvalidPathError(
             `MarkDB path must be a relative vault path: ${path}`,
             path,

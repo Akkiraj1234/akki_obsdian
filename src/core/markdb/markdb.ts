@@ -92,14 +92,14 @@ function openMarkDB(
  * and the required record schema.
  * @returns A promise that resolves to an initialized `DatabaseMarkDB` instance.
  */
-function openMarkDB(
+function openMarkDB<T>(
     context: MarkDBStorageContext,
     path: string,
     options: MarkDBOptions & {
         format: "database";
-        schema: RecordSchema;
+        schema: RecordSchema<T>;
     },
-): Promise<DatabaseMarkDB>;
+): Promise<DatabaseMarkDB<T>>;
 
 /**
  * Opens a file-format MarkDB file or creates one if it does not exist

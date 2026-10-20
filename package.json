@@ -5,6 +5,7 @@
 	"main": "main.js",
 	"type": "module",
 	"scripts": {
+		"test": "node --import jiti/register src/core/markdb/test/errors.test.ts && node --import jiti/register src/core/markdb/test/core.test.ts && node --import jiti/register src/core/markdb/test/backends.test.ts",
 		"dev": "node esbuild.config.mjs",
 		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
 		"version": "node version-bump.mjs && git add manifest.json versions.json",
