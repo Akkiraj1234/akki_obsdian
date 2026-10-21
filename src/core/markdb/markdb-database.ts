@@ -25,10 +25,13 @@ class DatabaseMarkDB<T = unknown> {
 
     /** Reads the cached records, loading and schema-validating them once. */
     async read(): Promise<readonly T[]> {
-        await this.load();
+        if (!this.loaded) {
+            await this.load();
+        }
+
         return this.records as readonly T[];
     }
-
+    
     /** Replaces every cached record after validating it against the schema. */
     async write(records: readonly T[]): Promise<void> {
         const next = [...records];

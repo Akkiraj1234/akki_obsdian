@@ -45,6 +45,52 @@
     width: min(900px, 92vw);
 }
 
+.akki-hobby-manager {
+    padding: var(--size-4-3);
+}
+
+.akki-hobby-manager-title {
+    margin: 0 0 var(--size-4-4);
+    font-size: var(--h3-size);
+}
+
+.akki-hobby-manager-form {
+    display: flex;
+    align-items: center;
+    gap: var(--size-4-2);
+    margin-bottom: var(--size-4-4);
+}
+
+.akki-hobby-manager-form input {
+    min-width: 0;
+    flex: 1;
+}
+
+.akki-hobby-manager-form button,
+.akki-hobby-delete-button {
+    flex: 0 0 32px;
+    width: 32px;
+    height: 32px;
+}
+
+.akki-hobby-list {
+    border-top: 1px solid var(--background-modifier-border);
+}
+
+.akki-hobby-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--size-4-2);
+    min-height: 44px;
+    padding: var(--size-4-2) 0;
+    border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.akki-hobby-name {
+    overflow-wrap: anywhere;
+}
+
 .akki-hobby-window-header,
 .akki-hobby-pane-heading,
 .akki-hobby-row,

@@ -1,4 +1,4 @@
-import { Modal, type App, type Plugin } from 'obsidian';
+import { ItemView, Modal, type App, type Plugin, type WorkspaceLeaf } from 'obsidian';
 import type { AkkiObsidianApp } from '@/core/app';
 import type { WidgetDefinition } from '@/core/types';
 import { renderHobbyManager } from './hobby_manager';
@@ -7,6 +7,17 @@ import { renderHobbyTracker } from './hobby_tracker';
 import { DEFAULT_HOBBY_SETTINGS, renderHobbySettings, type HobbySettings } from './settings';
 
 type HobbyPane = 'tracker' | 'planner' | 'manager';
+const HOBBY_MANAGER_VIEW = 'akki-hobby-manager';
+
+class HobbyManagerView extends ItemView {
+    constructor(leaf: WorkspaceLeaf, private readonly hobbyApp: AkkiObsidianApp) { super(leaf); }
+    getViewType(): string { return HOBBY_MANAGER_VIEW; }
+    getDisplayText(): string { return 'Hobby manager'; }
+    getIcon(): string { return 'list-checks'; }
+    async onOpen(): Promise<void> {
+        await renderHobbyManager(this.contentEl, this.hobbyApp.get_markdb());
+    }
+}
 
 /** Owns the hobby window: tabs, lifecycle, and the ribbon entry point. */
 class HobbyWindow extends Modal {
@@ -49,14 +60,7 @@ class HobbyWindow extends Modal {
         const db = this.hobbyApp.get_markdb();
         if (this.activePane === 'tracker') await renderHobbyTracker(panel, db);
         else if (this.activePane === 'planner') await renderHobbyPlanner(panel, db);
-        else await renderHobbyManager(panel, db, {
-            onHobbiesChanged: async () => this.refreshActivePane(),
-        });
-    }
-
-    private async refreshActivePane(): Promise<void> {
-        const panel = this.contentEl.querySelector<HTMLElement>('.akki-hobby-panel');
-        if (panel) await this.renderPane(panel);
+        else await renderHobbyManager(panel, db);
     }
 }
 
@@ -70,11 +74,21 @@ class HobbyWidget {
     ) {}
 
     async on_load(): Promise<void> {
-        await this.app.get_markdb().ensureYearFiles(new Date().getFullYear());
+        this.plugin.registerView(HOBBY_MANAGER_VIEW, (leaf) => new HobbyManagerView(leaf, this.app));
+        this.plugin.registerMarkdownCodeBlockProcessor('hobby-manager', (_source, container) => {
+            void renderHobbyManager(container, this.app.get_markdb());
+        });
+        this.plugin.registerMarkdownCodeBlockProcessor('hobby-manger', (_source, container) => {
+            void renderHobbyManager(container, this.app.get_markdb());
+        });
         this.initializeWorkspace();
+        this.plugin.app.workspace.onLayoutReady(() => void this.openSidebar());
     }
 
-    async on_unload(): Promise<void> { this.uninitializeWorkspace(); }
+    async on_unload(): Promise<void> {
+        this.uninitializeWorkspace();
+        this.plugin.app.workspace.detachLeavesOfType(HOBBY_MANAGER_VIEW);
+    }
 
     async on_settings_changed(): Promise<void> {
         this.uninitializeWorkspace();
@@ -92,6 +106,14 @@ class HobbyWidget {
     }
 
     private openWindow(): void { new HobbyWindow(this.plugin.app, this.app).open(); }
+
+    private async openSidebar(): Promise<void> {
+        const existing = this.plugin.app.workspace.getLeavesOfType(HOBBY_MANAGER_VIEW)[0];
+        const leaf = existing ?? this.plugin.app.workspace.getRightLeaf(false);
+        if (!leaf) return;
+        if (!existing) await leaf.setViewState({ type: HOBBY_MANAGER_VIEW, active: true });
+        await this.plugin.app.workspace.revealLeaf(leaf);
+    }
 }
 
 export const hobbyWidget: WidgetDefinition<HobbySettings> = {
