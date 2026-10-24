@@ -1,11 +1,9 @@
 import { Notice, setIcon } from 'obsidian';
 import type { Hobby, MarkDb } from '@/core/markdb/maindb';
 
+
 /** Renders the shared add-and-delete hobby list. */
-export async function renderHobbyManager(
-    containerEl: HTMLElement,
-    db: MarkDb,
-): Promise<void> {
+export async function renderHobbyManager( containerEl: HTMLElement, db: MarkDb ): Promise<void> {
     containerEl.empty();
     containerEl.addClass('akki-hobby-manager');
     containerEl.createEl('h2', { text: 'Hobbies', cls: 'akki-hobby-manager-title' });
