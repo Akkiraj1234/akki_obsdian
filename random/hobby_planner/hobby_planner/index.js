@@ -1,4 +1,4 @@
-import { HobbyPlanner } from './fakedata.js';
+import { HobbyPlanner } from '../fakedata.js';
 
 const MONTH_WIDTH = 100;
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];

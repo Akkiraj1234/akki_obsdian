@@ -10,10 +10,8 @@
  * Reverse diffs restore older planner states from the latest snapshot.
  */
 
-import { number, object } from "zod";
 
-
-const FAKE_HOBBIES = {
+export const FAKE_HOBBIES = {
 	'hobby-coding': {
 		name: 'Coding',
 		createdAt: '2026-01-01T09:00:00',
@@ -109,7 +107,7 @@ export const HONNY_PLANNER = {
 	title: "Hobby Planner",
 	description: "Skills, activities and personal growth manager",
 	nextSectionId: 7,
-	
+
 	data: {
 		2026: {
 			latestMonth: "oct",
@@ -366,33 +364,6 @@ const ACTIVITY_LOGS = {
 }
 
 
-export class Hobby {
-	constructor() {
-		this.data = FAKE_HOBBIES;
-	}
-
-	get(id) {
-		const hobby = this.data[id];
-		return hobby ? { id, ...hobby } : null;
-	}
-
-	get_name() {
-		return Object.keys(this.data);
-	}
-
-	get_all() {
-		return Object.entries(this.data).map(([id, hobby]) => ({
-			id,
-			...hobby,
-		}));
-	}
-
-	get_children(parentId) {
-		return this.get_all().filter((hobby) => hobby.parentId === parentId);
-	}
-}
-
-
 const MONTHS = [
 	"jan", "feb", "mar", "apr", "may", "jun",
 	"jul", "aug", "sep", "oct", "nov", "dec",
@@ -414,7 +385,7 @@ export class HobbyPlanner {
 	get(yearOrCurrent, month) {
 		const year = this.#normalizeYear(yearOrCurrent);
 
-		if (!Number.isInteger(year) || !Object.hasOwn(this.planner.data, year)){
+		if (!Number.isInteger(year) || !Object.hasOwn(this.planner.data, year)) {
 			return null;
 		}
 
@@ -450,7 +421,7 @@ export class HobbyPlanner {
 			index--
 		) {
 			const changes = yearData.changes[MONTHS[index]];
-filterfilterfilter
+			filterfilterfilter
 			if (changes) {
 				this.#reverseChanges(changes, sections, order);
 			}
