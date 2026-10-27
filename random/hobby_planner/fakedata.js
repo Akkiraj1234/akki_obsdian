@@ -103,7 +103,7 @@ export const FAKE_HOBBIES = {
  * For example, `changes.sep` contains the changes to reverse
  * when reconstructing September from the October snapshot.
  */
-export const HONNY_PLANNER = {
+export const HOBBY_PLANNER = {
 	title: "Hobby Planner",
 	description: "Skills, activities and personal growth manager",
 	nextSectionId: 7,
