@@ -10,6 +10,8 @@
  * Reverse diffs restore older planner states from the latest snapshot.
  */
 
+import { id } from "zod/locales";
+
 
 export const FAKE_HOBBIES = {
 	'hobby-coding': {
@@ -138,7 +140,7 @@ export const HOBBY_PLANNER = {
 					modifiedAt: "2026-07",
 				},
 
-				"6": {
+				"5": {
 					title: "Reading & Learning",
 					slotsAllow: 2,
 					childAllow: true,
@@ -158,7 +160,7 @@ export const HOBBY_PLANNER = {
 							treatChildAsSlot: true,
 						},
 					},
-					"6": {
+					"5": {
 						action: "create",
 						previous: null,
 					},
@@ -265,8 +267,110 @@ export const HOBBY_PLANNER = {
 	},
 };
 
+// primary key = hobby-coding
+// 2nd key = section id
 
-const ACTIVITY_INFO = {
+// {
+// 	2026: {
+// 		1: {
+// 			{hobbyid, start, end, sectionid}
+// 		}
+// 	}
+// }
+
+const ACTIVITY_INFO_NEW = {
+	2026: {
+		1: [
+			{ id: "hobby-coding", sectionid: 1, slot: 0, start: null, end: null },
+			{ id: "hobby-leetcode", sectionid: 1, slot: 1, start: null, end: null },
+			{ id: "hobby-sketching", sectionid: 2, slot: 0, start: null, end: null },
+			{ id: "hobby-guitar", sectionid: 2, slot: 1, start: null, end: null },
+			{ id: "hobby-workout", sectionid: 3, slot: 0, start: null, end: null },
+		],
+		2: [
+			{ id: "hobby-coding", sectionid: 1, slot: 0, start: null, end: null },
+			{ id: "hobby-leetcode", sectionid: 1, slot: 1, start: null, end: null },
+			{ id: "hobby-sketching", sectionid: 2, slot: 0, start: null, end: null },
+			{ id: "hobby-guitar", sectionid: 2, slot: 1, start: null, end: null },
+			{ id: "hobby-workout", sectionid: 3, slot: 0, start: null, end: null },
+		],
+		3: [
+			{ id: "hobby-coding", sectionid: 1, slot: 0, start: null, end: null },
+			{ id: "hobby-leetcode", sectionid: 1, slot: 1, start: null, end: null },
+			{ id: "hobby-sketching", sectionid: 2, slot: 0, start: null, end: null },
+			{ id: "hobby-chess", sectionid: 2, slot: 1, start: null, end: null },
+			{ id: "hobby-workout", sectionid: 3, slot: 0, start: null, end: null },
+		],
+		4: [
+			{ id: "hobby-coding", sectionid: 1, slot: 0, start: null, end: null },
+			{ id: "hobby-leetcode", sectionid: 1, slot: 1, start: null, end: null },
+			{ id: "hobby-sketching", sectionid: 2, slot: 0, start: null, end: null },
+			{ id: "hobby-workout", sectionid: 3, slot: 0, start: null, end: null },
+		],
+		5: [
+			{ id: "hobby-coding", sectionid: 1, slot: 0, start: null, end: null },
+			{ id: "hobby-leetcode", sectionid: 1, slot: 1, start: null, end: null },
+			{ id: "hobby-sketching", sectionid: 2, slot: 0, start: null, end: null },
+			{ id: "hobby-guitar", sectionid: 2, slot: 1, start: null, end: null },
+			{ id: "hobby-workout", sectionid: 3, slot: 0, start: null, end: null },
+		],
+		6: [
+			{ id: "hobby-coding", sectionid: 1, slot: 0, start: null, end: null },
+			{ id: "hobby-leetcode", sectionid: 1, slot: 1, start: null, end: null },
+			{ id: "hobby-sketching", sectionid: 2, slot: 0, start: null, end: null },
+			{ id: "hobby-guitar", sectionid: 2, slot: 1, start: null, end: null },
+			{ id: "hobby-workout", sectionid: 3, slot: 0, start: null, end: null },
+		],
+		7: [
+			{ id: "hobby-coding", sectionid: 1, slot: 0, start: null, end: null },
+			{ id: "hobby-leetcode", sectionid: 1, slot: 1, start: null, end: null },
+			{ id: "hobby-sketching", sectionid: 2, slot: 0, start: null, end: null },
+			{ id: "hobby-guitar", sectionid: 2, slot: 1, start: null, end: null },
+			{ id: "hobby-workout", sectionid: 3, slot: 0, start: null, end: null },
+		],
+		8: [
+			{ id: "hobby-coding", sectionid: 1, slot: 0, start: null, end: null },
+			{ id: "hobby-sketching", sectionid: 2, slot: 0, start: null, end: null },
+			{ id: "hobby-chess", sectionid: 2, slot: 1, start: null, end: null },
+			{ id: "hobby-guitar", sectionid: 4, slot: 0, start: null, end: null },
+			{ id: "hobby-workout", sectionid: 3, slot: 0, start: null, end: null },
+		],
+		9: [
+			{ id: "hobby-coding", sectionid: 1, slot: 0, start: null, end: null },
+			{ id: "hobby-leetcode", sectionid: 1, slot: 1, start: null, end: null },
+			{ id: "hobby-reading", sectionid: 5, slot: 0, start: null, end: null },
+			{ id: "hobby-chess", sectionid: 2, slot: 1, start: null, end: null },
+			{ id: "hobby-guitar", sectionid: 4, slot: 0, start: null, end: null },
+			{ id: "hobby-workout", sectionid: 3, slot: 0, start: null, end: null },
+		],
+		10: [
+			{ id: "hobby-coding", sectionid: 1, slot: 0, start: null, end: null },
+			{ id: "hobby-leetcode", sectionid: 1, slot: 1, start: null, end: null },
+			{ id: "hobby-reading", sectionid: 5, slot: 0, start: null, end: null },
+			{ id: "hobby-chess", sectionid: 2, slot: 1, start: null, end: null },
+			{ id: "hobby-guitar", sectionid: 4, slot: 0, start: null, end: null },
+			{ id: "hobby-workout", sectionid: 3, slot: 0, start: null, end: null },
+		],
+		11: [
+			{ id: "hobby-coding", sectionid: 1, slot: 0, start: null, end: null },
+			{ id: "hobby-leetcode", sectionid: 1, slot: 1, start: null, end: null },
+			{ id: "hobby-reading", sectionid: 5, slot: 0, start: null, end: null },
+			{ id: "hobby-chess", sectionid: 2, slot: 1, start: null, end: null },
+			{ id: "hobby-guitar", sectionid: 4, slot: 0, start: null, end: null },
+			{ id: "hobby-workout", sectionid: 3, slot: 0, start: null, end: null },
+		],
+		9: [
+			{ id: "hobby-coding", sectionid: 1, slot: 0, start: null, end: null },
+			{ id: "hobby-leetcode", sectionid: 1, slot: 1, start: null, end: null },
+			{ id: "hobby-reading", sectionid: 5, slot: 0, start: null, end: null },
+			{ id: "hobby-chess", sectionid: 2, slot: 1, start: null, end: null },
+			{ id: "hobby-guitar", sectionid: 4, slot: 0, start: null, end: null },
+			{ id: "hobby-workout", sectionid: 3, slot: 0, start: null, end: null },
+		]
+	}
+}
+
+export const ACTIVITY_INFO = {
 	'section-skills-slot-0': [
 		{
 			id: 'period-001',
@@ -320,7 +424,7 @@ const ACTIVITY_INFO = {
 };
 
 
-const ACTIVITY_LOGS = {
+export const ACTIVITY_LOGS = {
 	'hobby-coding': {
 		'2026-01': [
 			60, 0, 90, 45, 120, 0, 30, 60, 0, 75, 90, 40, 0, 60, 120, 30, 45, 0, 90, 60, 30, 75, 0,
@@ -360,174 +464,5 @@ const ACTIVITY_LOGS = {
 			10, 20, 0, 15, 30, 0, 25, 10, 0, 20, 15, 30, 0, 10, 25, 20, 0, 15, 30, 10, 0, 20, 15,
 			25, 0, 10, 30, 20, 0, 15, 25,
 		],
-	}
-}
-
-
-const MONTHS = [
-	"jan", "feb", "mar", "apr", "may", "jun",
-	"jul", "aug", "sep", "oct", "nov", "dec",
-];
-
-export class HobbyPlanner {
-	constructor() {
-		this.planner = HONNY_PLANNER;
-	}
-
-	/**
-	 * Get the latest snapshot or reconstruct a historical month.
-	 *
-	 * get("curr")       -> latest year and latest month
-	 * get(2026)          -> latest snapshot for 2026
-	 * get(2026, "oct")   -> October 2026
-	 * get(2026, "sep")   -> September 2026
-	 */
-	get(yearOrCurrent, month) {
-		const year = this.#normalizeYear(yearOrCurrent);
-
-		if (!Number.isInteger(year) || !Object.hasOwn(this.planner.data, year)) {
-			return null;
-		}
-
-		const yearData = this.planner.data[year];
-		const targetMonth = this.#normalizeMonth(month, yearData.latestMonth);
-
-		if (!targetMonth) {
-			return null;
-		}
-
-		const targetIndex = MONTHS.indexOf(targetMonth);
-		const latestIndex = MONTHS.indexOf(yearData.latestMonth);
-
-		// Validate the target and snapshot months.
-		if (
-			targetIndex === -1 ||
-			latestIndex === -1 ||
-			targetIndex > latestIndex
-		) {
-			return null;
-		}
-
-		// Copy the snapshot; never mutate the original data.
-		const sections = structuredClone(yearData.latest);
-		const order = yearData.order.filter(
-			(id) => Object.hasOwn(sections, id)
-		);
-
-		// Reverse each month's changes to reach the target.
-		for (
-			let index = latestIndex - 1;
-			index >= targetIndex;
-			index--
-		) {
-			const changes = yearData.changes[MONTHS[index]];
-			filterfilterfilter
-			if (changes) {
-				this.#reverseChanges(changes, sections, order);
-			}
-		}
-
-		return {
-			title: this.planner.title,
-			description: this.planner.description,
-			year,
-			month: targetMonth,
-			order,
-			latest: sections,
-		};
-	}
-
-	#normalizeYear(yearOrCurrent) {
-		if (
-			typeof yearOrCurrent === "string" &&
-			yearOrCurrent.toLowerCase() === "curr"
-		) {
-			// Resolve to the current year rather then max yearin planner
-			// reason bcz we could create future year plan
-			return new Date().getFullYear();
-		}
-
-		if (typeof yearOrCurrent === "number") {
-			return Number(yearOrCurrent);
-		}
-
-		return NaN;
-	}
-
-	#normalizeMonth(month, latestMonth) {
-		// If no month is supplied, use the year's latest snapshot.
-		if (month == null || typeof month === "string" || month === "curr") {
-			return latestMonth;
-		}
-
-		if (typeof month !== "string") {
-			return null;
-		}
-
-		const normalized = month.trim().toLowerCase().slice(0, 3);
-		return MONTHS.includes(normalized) ? normalized : null;
-	}
-
-	#reverseChanges(changes, sections, order) {
-		for (const [id, change] of Object.entries(changes)) {
-			switch (change.action) {
-				case "update": {
-					if (
-						Object.hasOwn(sections, id) &&
-						change.previous
-					) {
-						sections[id] = {
-							...sections[id],
-							...structuredClone(change.previous),
-						};
-					}
-
-					break;
-				}
-
-				case "create": {
-					// Undo the creation by removing this section.
-					delete sections[id];
-
-					const index = order.indexOf(id);
-
-					if (index !== -1) {
-						order.splice(index, 1);
-					}
-
-					break;
-				}
-
-				case "delete": {
-					// Undo the deletion by restoring the section.
-					if (!change.previous) {
-						break;
-					}
-
-					sections[id] = structuredClone(change.previous);
-
-					// Avoid duplicate IDs in the display order.
-					const existingIndex = order.indexOf(id);
-
-					if (existingIndex !== -1) {
-						order.splice(existingIndex, 1);
-					}
-
-					const index = Math.max(
-						0,
-						Math.min(change.index ?? order.length, order.length)
-					);
-
-					order.splice(index, 0, id);
-
-					break;
-				}
-
-				default:
-					throw new Error(
-						`Unknown planner action "${change.action}" for section ${id}`
-					);
-			}
-		}
 	}
 }

@@ -1,9 +1,10 @@
-import { FAKE_HOBBIES, HOBBY_PLANNER } from "./fakedata.js";
+import { FAKE_HOBBIES, HOBBY_PLANNER, ACTIVITY_INFO, ACTIVITY_LOGS } from "./fakedata.js";
 
 const MONTHS = [
     "jan", "feb", "mar", "apr", "may", "jun",
     "jul", "aug", "sep", "oct", "nov", "dec"
 ];
+
 
 /*
 this is the main class to fatch hobbies related data
@@ -80,6 +81,10 @@ class HobbyPlannerManager {
 
     }
 
+    get_with_activity() {
+
+    }
+
     #normalizeYear(year) {
         if (year == null) {
             year = new Date().getFullYear();
@@ -149,7 +154,6 @@ class HobbyPlannerManager {
             : uniqueMonths[uniqueMonths.length - 1];
     }
 
-
     #packData(month_data, order, year, month) {
         return {
             title: HOBBY_PLANNER.title,
@@ -160,7 +164,6 @@ class HobbyPlannerManager {
             order: order
         }
     }
-
 
     #getPreviousState(year_data, target_month) {
         const latest_index = MONTHS.indexOf(year_data.latestMonth);
@@ -264,10 +267,15 @@ class HobbyPlannerManager {
             order: current_order,
         };
     }
+}
 
+class ActivityManager {
 
 }
 
+class ActivityHeatmapManager {
+
+}
 
 
 
@@ -277,10 +285,47 @@ class HobbyPlannerManager {
 
 
 function test_run() {
-    const data = new HobbyManager();
-    console.log(data.get("hobby-coding"))
-    console.log(data.get_children("hobby-coding"))
-    console.log(data.get_children("hobby-leetcode"))
-    console.log(data.get_all())
+    // const data = new HobbyManager();
+    // console.log(data.get("hobby-coding"))
+    // console.log(data.get_children("hobby-coding"))
+    // console.log(data.get_children("hobby-leetcode"))
+    // console.log(data.get_all())
+
+    const hobblyplanner = new HobbyPlannerManager();
+    console.log(hobblyplanner.get());
+    console.log(hobblyplanner.get("sep", 2026));
+
+
 }
 test_run();
+
+/*
+hobby-coding
+hobby-leetcode
+hobby-reading
+hobby-chess
+hobby-sketching
+hobby-workout
+hobby-guitar
+
+
+jan -> 1, 2, 3
+feb -> 1, 2, 3
+mar -> 1, 2, 3
+apr -> 1, 2, 3
+may -> 1, 2, 3
+jun -> 1, 2, 3
+jul -> 1, 2, 3
+aug -> 1, 2, 3, 4
+sep -> 1, 2, 4, 5
+oct -> 1, 2, 4, 5
+nov -> 1, 2, 4, 5
+dec -> 1, 2, 4, 5
+
+1: Programming & Skills
+2: Creative Activities
+3. Fitness
+4. Music
+5. Reading & Learning
+
+*/
