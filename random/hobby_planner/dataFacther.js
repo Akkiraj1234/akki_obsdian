@@ -1,10 +1,12 @@
 import { FAKE_HOBBIES, HOBBY_PLANNER, ACTIVITY_INFO, ACTIVITY_LOGS } from "./fakedata.js";
 
 const MONTHS = [
-    "jan", "feb", "mar", "apr", "may", "jun",
-    "jul", "aug", "sep", "oct", "nov", "dec"
+    "January", "February", "March", "April",
+    "May", "June", "July", "August",
+    "September", "October", "November", "December",
 ];
 
+const VALID_DATA_TYPE = ["boolean", "count", "duration", "rating"];
 
 /*
 this is the main class to fatch hobbies related data
@@ -16,7 +18,7 @@ this class provide api to fatch those data these provides
 not everything is implemented yet
 */
 
-class HobbyManager {
+export class HobbyManager {
 
     get(hobbyid) {
         const result = FAKE_HOBBIES[hobbyid];
@@ -47,7 +49,7 @@ get: this function takes month and year as input if given its try
     planner state if month and year not given its takes curr year and curr month
     as input
 */
-class HobbyPlannerManager {
+export class HobbyPlannerManager {
 
     get(month = null, year = null) {
         const target_year = this.#normalizeYear(year);
@@ -269,15 +271,13 @@ class HobbyPlannerManager {
     }
 }
 
-class ActivityManager {
+export class ActivityManager {
 
 }
 
-class ActivityHeatmapManager {
+export class ActivityHeatmapManager {
 
 }
-
-
 
 
 
@@ -298,34 +298,3 @@ function test_run() {
 
 }
 test_run();
-
-/*
-hobby-coding
-hobby-leetcode
-hobby-reading
-hobby-chess
-hobby-sketching
-hobby-workout
-hobby-guitar
-
-
-jan -> 1, 2, 3
-feb -> 1, 2, 3
-mar -> 1, 2, 3
-apr -> 1, 2, 3
-may -> 1, 2, 3
-jun -> 1, 2, 3
-jul -> 1, 2, 3
-aug -> 1, 2, 3, 4
-sep -> 1, 2, 4, 5
-oct -> 1, 2, 4, 5
-nov -> 1, 2, 4, 5
-dec -> 1, 2, 4, 5
-
-1: Programming & Skills
-2: Creative Activities
-3. Fitness
-4. Music
-5. Reading & Learning
-
-*/
