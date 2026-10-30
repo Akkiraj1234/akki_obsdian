@@ -123,7 +123,7 @@ export const HOBBY_PLANNER = {
 
 	data: {
 		2026: {
-			latestMonth: 10,
+			latestMonth: 9,
 			order: ["1", "2", "4", "5"],
 
 			latest: {
@@ -161,7 +161,7 @@ export const HOBBY_PLANNER = {
 			},
 
 			changes: {
-				9: {
+				8: {
 					"1": {
 						action: "update",
 						previous: {
@@ -176,7 +176,7 @@ export const HOBBY_PLANNER = {
 						previous: null,
 					},
 				},
-				8: {
+				7: {
 					"3": {
 						action: "delete",
 						index: 2,
@@ -189,13 +189,13 @@ export const HOBBY_PLANNER = {
 						},
 					},
 				},
-				6: {
+				5: {
 					"4": {
 						action: "create",
 						previous: null,
 					},
 				},
-				3: {
+				2: {
 					"2": {
 						action: "update",
 						previous: {
@@ -206,7 +206,7 @@ export const HOBBY_PLANNER = {
 						},
 					},
 				},
-				2: {
+				1: {
 					"3": {
 						action: "update",
 						previous: {
@@ -218,7 +218,7 @@ export const HOBBY_PLANNER = {
 						},
 					},
 				},
-				1: {
+				0: {
 					"1": {
 						action: "update",
 						previous: {
@@ -234,7 +234,7 @@ export const HOBBY_PLANNER = {
 		},
 
 		2025: {
-			latestMonth: 12,
+			latestMonth: 11,
 			order: ["1", "2", "3", "5"],
 
 			latest: {
@@ -262,7 +262,7 @@ export const HOBBY_PLANNER = {
 			},
 
 			changes: {
-				11: {
+				10: {
 					"1": {
 						action: "update",
 						previous: {
@@ -289,8 +289,15 @@ export const HOBBY_PLANNER = {
 // 	}
 // }
 
-const ACTIVITY_INFO_NEW = {
+export const ACTIVITY_INFO = {
 	2026: {
+		0: [
+			{ id: "hobby-coding", sectionid: 1, slot: 0, start: null, end: null },
+			{ id: "hobby-leetcode", sectionid: 1, slot: 1, start: null, end: null },
+			{ id: "hobby-sketching", sectionid: 2, slot: 0, start: null, end: null },
+			{ id: "hobby-guitar", sectionid: 2, slot: 1, start: null, end: null },
+			{ id: "hobby-workout", sectionid: 3, slot: 0, start: null, end: null },
+		],
 		1: [
 			{ id: "hobby-coding", sectionid: 1, slot: 0, start: null, end: null },
 			{ id: "hobby-leetcode", sectionid: 1, slot: 1, start: null, end: null },
@@ -302,20 +309,20 @@ const ACTIVITY_INFO_NEW = {
 			{ id: "hobby-coding", sectionid: 1, slot: 0, start: null, end: null },
 			{ id: "hobby-leetcode", sectionid: 1, slot: 1, start: null, end: null },
 			{ id: "hobby-sketching", sectionid: 2, slot: 0, start: null, end: null },
-			{ id: "hobby-guitar", sectionid: 2, slot: 1, start: null, end: null },
+			{ id: "hobby-chess", sectionid: 2, slot: 1, start: null, end: null },
 			{ id: "hobby-workout", sectionid: 3, slot: 0, start: null, end: null },
 		],
 		3: [
 			{ id: "hobby-coding", sectionid: 1, slot: 0, start: null, end: null },
 			{ id: "hobby-leetcode", sectionid: 1, slot: 1, start: null, end: null },
 			{ id: "hobby-sketching", sectionid: 2, slot: 0, start: null, end: null },
-			{ id: "hobby-chess", sectionid: 2, slot: 1, start: null, end: null },
 			{ id: "hobby-workout", sectionid: 3, slot: 0, start: null, end: null },
 		],
 		4: [
 			{ id: "hobby-coding", sectionid: 1, slot: 0, start: null, end: null },
 			{ id: "hobby-leetcode", sectionid: 1, slot: 1, start: null, end: null },
 			{ id: "hobby-sketching", sectionid: 2, slot: 0, start: null, end: null },
+			{ id: "hobby-guitar", sectionid: 2, slot: 1, start: null, end: null },
 			{ id: "hobby-workout", sectionid: 3, slot: 0, start: null, end: null },
 		],
 		5: [
@@ -334,14 +341,15 @@ const ACTIVITY_INFO_NEW = {
 		],
 		7: [
 			{ id: "hobby-coding", sectionid: 1, slot: 0, start: null, end: null },
-			{ id: "hobby-leetcode", sectionid: 1, slot: 1, start: null, end: null },
 			{ id: "hobby-sketching", sectionid: 2, slot: 0, start: null, end: null },
-			{ id: "hobby-guitar", sectionid: 2, slot: 1, start: null, end: null },
+			{ id: "hobby-chess", sectionid: 2, slot: 1, start: null, end: null },
+			{ id: "hobby-guitar", sectionid: 4, slot: 0, start: null, end: null },
 			{ id: "hobby-workout", sectionid: 3, slot: 0, start: null, end: null },
 		],
 		8: [
 			{ id: "hobby-coding", sectionid: 1, slot: 0, start: null, end: null },
-			{ id: "hobby-sketching", sectionid: 2, slot: 0, start: null, end: null },
+			{ id: "hobby-leetcode", sectionid: 1, slot: 1, start: null, end: null },
+			{ id: "hobby-reading", sectionid: 5, slot: 0, start: null, end: null },
 			{ id: "hobby-chess", sectionid: 2, slot: 1, start: null, end: null },
 			{ id: "hobby-guitar", sectionid: 4, slot: 0, start: null, end: null },
 			{ id: "hobby-workout", sectionid: 3, slot: 0, start: null, end: null },
@@ -369,14 +377,6 @@ const ACTIVITY_INFO_NEW = {
 			{ id: "hobby-chess", sectionid: 2, slot: 1, start: null, end: null },
 			{ id: "hobby-guitar", sectionid: 4, slot: 0, start: null, end: null },
 			{ id: "hobby-workout", sectionid: 3, slot: 0, start: null, end: null },
-		],
-		12: [
-			{ id: "hobby-coding", sectionid: 1, slot: 0, start: null, end: null },
-			{ id: "hobby-leetcode", sectionid: 1, slot: 1, start: null, end: null },
-			{ id: "hobby-reading", sectionid: 5, slot: 0, start: null, end: null },
-			{ id: "hobby-chess", sectionid: 2, slot: 1, start: null, end: null },
-			{ id: "hobby-guitar", sectionid: 4, slot: 0, start: null, end: null },
-			{ id: "hobby-workout", sectionid: 3, slot: 0, start: null, end: null },
 		]
 	}
 }
@@ -393,7 +393,7 @@ const ACTIVITY_INFO_NEW = {
  */
 export const ACTIVITY_HEATMAP_DATA = {
 	2026: {
-		1: {
+		0: {
 			"hobby-coding": {
 				values: [1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1],
 				targetHistory: [{ from: 1, target: 1 }]
@@ -416,7 +416,7 @@ export const ACTIVITY_HEATMAP_DATA = {
 			}
 		},
 
-		2: { // February
+		1: { // February
 			"hobby-coding": {
 				values: [1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0],
 				targetHistory: [{ from: 1, target: 1 }]
@@ -439,7 +439,7 @@ export const ACTIVITY_HEATMAP_DATA = {
 			}
 		},
 
-		3: { // March
+		2: { // March
 			"hobby-coding": {
 				values: [1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1],
 				targetHistory: [{ from: 1, target: 1 }]
@@ -465,7 +465,7 @@ export const ACTIVITY_HEATMAP_DATA = {
 			}
 		},
 
-		4: { // April
+		3: { // April
 			"hobby-coding": {
 				values: [1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1],
 				targetHistory: [{ from: 1, target: 1 }]
@@ -487,7 +487,7 @@ export const ACTIVITY_HEATMAP_DATA = {
 			}
 		},
 
-		5: { // May
+		4: { // May
 			"hobby-coding": {
 				values: [1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1],
 				targetHistory: [{ from: 1, target: 1 }]
@@ -512,7 +512,7 @@ export const ACTIVITY_HEATMAP_DATA = {
 			}
 		},
 
-		6: { // June
+		5: { // June
 			"hobby-coding": {
 				values: [1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1],
 				targetHistory: [{ from: 1, target: 1 }]
@@ -538,7 +538,7 @@ export const ACTIVITY_HEATMAP_DATA = {
 			}
 		},
 
-		7: { // July
+		6: { // July
 			"hobby-coding": {
 				values: [1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1],
 				targetHistory: [{ from: 1, target: 1 }]
@@ -566,7 +566,7 @@ export const ACTIVITY_HEATMAP_DATA = {
 			}
 		},
 
-		8: { // August
+		7: { // August
 			"hobby-coding": {
 				values: [1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1],
 				targetHistory: [{ from: 1, target: 1 }]
@@ -592,7 +592,7 @@ export const ACTIVITY_HEATMAP_DATA = {
 			}
 		},
 
-		9: { // September
+		8: { // September
 			"hobby-coding": {
 				values: [1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1],
 				targetHistory: [{ from: 1, target: 1 }]
@@ -622,7 +622,7 @@ export const ACTIVITY_HEATMAP_DATA = {
 			}
 		},
 
-		10: { // October
+		9: { // October
 			"hobby-coding": {
 				values: [0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1],
 				targetHistory: [{ from: 1, target: 1 }]
@@ -655,7 +655,7 @@ export const ACTIVITY_HEATMAP_DATA = {
 			}
 		},
 
-		11: { // November
+		10: { // November
 			"hobby-coding": {
 				values: [1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1],
 				targetHistory: [{ from: 1, target: 1 }]
@@ -685,7 +685,7 @@ export const ACTIVITY_HEATMAP_DATA = {
 			}
 		},
 
-		12: { // December
+		11: { // December
 			"hobby-coding": {
 				values: [1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1],
 				targetHistory: [{ from: 1, target: 1 }]

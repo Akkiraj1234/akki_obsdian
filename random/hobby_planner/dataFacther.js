@@ -1,16 +1,16 @@
-import { FAKE_HOBBIES, HOBBY_PLANNER, ACTIVITY_INFO, ACTIVITY_LOGS } from "./fakedata.js";
+import { FAKE_HOBBIES, HOBBY_PLANNER, ACTIVITY_INFO, ACTIVITY_HEATMAP_DATA } from './fakedata.js';
 
-const MONTHS = [
-    "January", "February", "March", "April",
-    "May", "June", "July", "August",
-    "September", "October", "November", "December",
+export const MONTHS = [
+    'January', 'February', 'March', 'April',
+    'May', 'June', 'July', 'August', 'September',
+    'October', 'November', 'December',
 ];
 
-const VALID_DATA_TYPE = [
-    "boolean",
-    "count",
-    "duration",
-    "rating"
+export const VALID_DATA_TYPE = [
+    'boolean',
+    'count',
+    'duration',
+    'rating'
 ];
 
 
@@ -40,10 +40,9 @@ export class HobbyManager {
             Object.entries(FAKE_HOBBIES)
                 .filter(([_, data]) => data.parentId === hobbyid)
                 .map(([id, data]) => [id, structuredClone(data)])
-        )
+        );
     }
 }
-
 
 /*
 this class repersent hobby planner data state for all months
@@ -58,21 +57,21 @@ get: this function takes month and year as input if given its try
 export class HobbyPlannerManager {
 
     get(month = null, year = null) {
-        const target_year = this.#normalizeYear(year);
-        const target_month = this.#normalizeMonth(month, target_year);
-
+        const target_year = this.#closestYear(year);
+        const target_month = this.#closestmonth(month, target_year);
         const year_data = HOBBY_PLANNER.data[target_year];
+
         if (!year_data) {
             throw new Error(`No data available for year ${year}.`);
         }
 
-        if (target_month === year_data.latestMonth) {
+        if (target_month >= year_data.latestMonth) {
             return this.#packData(
                 year_data.latest,
                 year_data.order,
                 target_year,
-                target_month
-            )
+                target_month,
+            );
         }
 
         const { data, order } = this.#getPreviousState(
@@ -86,186 +85,162 @@ export class HobbyPlannerManager {
             target_year,
             target_month
         );
-
     }
 
     get_with_activity() {
 
     }
 
-    #normalizeYear(year) {
+    #closestYear(year) {
         if (year == null) {
             year = new Date().getFullYear();
         }
 
-        if (typeof year !== "number" || !Number.isInteger(year)) {
-            throw new TypeError("Year must be a valid number.");
+        if (typeof year !== 'number' || !Number.isInteger(year)) {
+            throw new TypeError('Year must be a valid number.');
         }
 
         const years = Object.keys(HOBBY_PLANNER.data).map(Number);
 
         if (years.length === 0) {
-            throw new Error("No years available in the planner.");
+            throw new Error('No years available in the planner.');
         }
 
         return years.reduce((closest, current) =>
             Math.abs(current - year) < Math.abs(closest - year)
                 ? current
-                : closest
+                : closest,
         );
     }
 
-    #normalizeMonth(month, year) {
-        if (month == null) {
-            month = MONTHS[new Date().getMonth()];
+    #closestmonth(month, year) {
+        month ??= new Date().getMonth();
+        const year_data = HOBBY_PLANNER.data[year];
 
-        } else {
-            if (typeof month !== "string") {
-                throw new TypeError("Month must be a string.");
-            }
-
-            month = month.trim().slice(0, 3).toLowerCase();
+        if (
+            typeof month !== 'number' ||
+            !Number.isInteger(month) ||
+            month < 0 ||
+            month > 11
+        ) {
+            throw new TypeError('Month must be an integer between 0 and 11.');
         }
 
-        const target = MONTHS.indexOf(month);
-
-        if (target === -1) {
-            throw new TypeError("Invalid month.");
-        }
-
-        const yearData = HOBBY_PLANNER.data[year];
-
-        if (!yearData) {
+        if (!year_data) {
             throw new Error(`No data available for year ${year}.`);
         }
 
         const available = [
-            ...Object.keys(yearData.changes),
-            yearData.latestMonth,
-        ]
-            .map(m => m.toLowerCase())
-            .filter(m => MONTHS.includes(m));
+            ...Object.keys(year_data.changes).map(Number),
+            year_data.latestMonth,
+        ];
 
-        const uniqueMonths = [...new Set(available)]
-            .sort((a, b) => MONTHS.indexOf(a) - MONTHS.indexOf(b));
+        const months = [...new Set(available)]
+            .filter((m) => Number.isInteger(m) && m >= 0 && m <= 11)
+            .sort((a, b) => a - b);
 
-        if (uniqueMonths.length === 0) {
+        if (months.length === 0) {
             throw new Error(`No months available for year ${year}.`);
         }
 
-        const previous = uniqueMonths.filter(
-            m => MONTHS.indexOf(m) <= target
-        );
+        let closest = months[months.length - 1];
 
-        return previous.length
-            ? previous[previous.length - 1]
-            : uniqueMonths[uniqueMonths.length - 1];
-    }
-
-    #packData(month_data, order, year, month) {
-        return {
-            title: HOBBY_PLANNER.title,
-            description: HOBBY_PLANNER.description,
-            year: year,
-            month: month,
-            data: month_data,
-            order: order
+        for (const current of months) {
+            if (current <= month) {
+                closest = current;
+            } else {
+                break;
+            }
         }
+
+        return closest;
     }
 
     #getPreviousState(year_data, target_month) {
-        const latest_index = MONTHS.indexOf(year_data.latestMonth);
-        const target_index = MONTHS.indexOf(target_month);
+        const latest_month = year_data.latestMonth;
 
-        if (latest_index === -1) {
-            throw new Error(`Invalid latestMonth: ${year_data.latestMonth}`);
+        if (
+            !Number.isInteger(latest_month) ||
+            latest_month < 0 ||
+            latest_month > 11
+        ) {
+            throw new Error(`Invalid latestMonth: ${latest_month}`);
         }
 
-        if (target_index === -1) {
+        if (
+            !Number.isInteger(target_month) ||
+            target_month < 0 ||
+            target_month > 11
+        ) {
             throw new Error(`Invalid target month: ${target_month}`);
         }
 
-        if (target_index > latest_index) {
-            throw new Error("Target month is later than the latest snapshot.");
+        if (target_month > latest_month) {
+            throw new Error('Target month is later than the latest snapshot.');
         }
 
         const current_data = structuredClone(year_data.latest);
         const current_order = [...year_data.order];
 
-        // Walk backwards from the latest snapshot to the target month.
-        for (let i = latest_index; i > target_index; i--) {
-            // This key stores the previous state to restore.
-            const history_month = MONTHS[i - 1];
-            const changes = year_data.changes[history_month] ?? {};
+        for (let month = latest_month - 1; month >= target_month; month--) {
+            const changes = year_data.changes[month] ?? {};
 
             for (const [id, change] of Object.entries(changes)) {
-                switch (change.action) {
-                    case "update": {
-                        if (!Object.hasOwn(current_data, id)) {
-                            throw new Error(
-                                `Cannot reverse update: section ${id} is missing.`
-                            );
-                        }
-
-                        if (change.previous == null) {
-                            throw new Error(
-                                `Missing previous data for section ${id}.`
-                            );
-                        }
-
-                        current_data[id] = structuredClone(change.previous);
-                        break;
-                    }
-
-                    case "create": {
-                        if (!Object.hasOwn(current_data, id)) {
-                            throw new Error(
-                                `Cannot reverse creation: section ${id} is missing.`
-                            );
-                        }
-
-                        delete current_data[id];
-
-                        const index = current_order.indexOf(id);
-
-                        if (index !== -1) {
-                            current_order.splice(index, 1);
-                        }
-
-                        break;
-                    }
-
-                    case "delete": {
-                        if (Object.hasOwn(current_data, id)) {
-                            throw new Error(
-                                `Cannot reverse deletion: section ${id} already exists.`
-                            );
-                        }
-
-                        if (change.previous == null) {
-                            throw new Error(
-                                `Missing previous data for deleted section ${id}.`
-                            );
-                        }
-
-                        current_data[id] = structuredClone(change.previous);
-
-                        const index = Math.max(
-                            0,
-                            Math.min(
-                                change.index ?? current_order.length,
-                                current_order.length
-                            )
-                        );
-
-                        current_order.splice(index, 0, id);
-                        break;
-                    }
-
-                    default:
+                if (change.action === 'update') {
+                    if (!Object.hasOwn(current_data, id)) {
                         throw new Error(
-                            `Unknown action "${change.action}" for section ${id}.`
+                            `Cannot reverse update: section ${id} is missing.`,
                         );
+                    }
+
+                    if (change.previous == null) {
+                        throw new Error(
+                            `Missing previous data for section ${id}.`,
+                        );
+                    }
+                    current_data[id] = structuredClone(change.previous);
+
+                } else if (change.action === 'create') {
+                    if (!Object.hasOwn(current_data, id)) {
+                        throw new Error(
+                            `Cannot reverse creation: section ${id} is missing.`,
+                        );
+                    }
+
+                    delete current_data[id];
+                    const index = current_order.indexOf(id);
+
+                    if (index !== -1) {
+                        current_order.splice(index, 1);
+                    }
+
+                } else if (change.action === 'delete') {
+                    if (Object.hasOwn(current_data, id)) {
+                        throw new Error(
+                            `Cannot reverse deletion: section ${id} already exists.`,
+                        );
+                    }
+
+                    if (change.previous == null) {
+                        throw new Error(
+                            `Missing previous data for deleted section ${id}.`,
+                        );
+                    }
+
+                    current_data[id] = structuredClone(change.previous);
+                    const index = Math.max(
+                        0,
+                        Math.min(
+                            change.index ?? current_order.length,
+                            current_order.length,
+                        ),
+                    );
+                    current_order.splice(index, 0, id);
+
+                } else {
+                    throw new Error(
+                        `Unknown action "${change.action}" for section ${id}.`,
+                    );
                 }
             }
         }
@@ -275,32 +250,19 @@ export class HobbyPlannerManager {
             order: current_order,
         };
     }
+
+    #packData(month_data, order, year, month) {
+        return {
+            title: HOBBY_PLANNER.title,
+            description: HOBBY_PLANNER.description,
+            year: year,
+            month: month,
+            data: structuredClone(month_data),
+            order: [...order],
+        };
+    }
 }
 
-export class ActivityManager {
+export class ActivityManager { }
 
-}
-
-export class ActivityHeatmapManager {
-
-}
-
-
-
-
-
-
-function test_run() {
-    // const data = new HobbyManager();
-    // console.log(data.get("hobby-coding"))
-    // console.log(data.get_children("hobby-coding"))
-    // console.log(data.get_children("hobby-leetcode"))
-    // console.log(data.get_all())
-
-    const hobblyplanner = new HobbyPlannerManager();
-    console.log(hobblyplanner.get());
-    console.log(hobblyplanner.get("sep", 2026));
-
-
-}
-test_run();
+export class ActivityHeatmapManager { }
