@@ -6,7 +6,13 @@ const MONTHS = [
     "September", "October", "November", "December",
 ];
 
-const VALID_DATA_TYPE = ["boolean", "count", "duration", "rating"];
+const VALID_DATA_TYPE = [
+    "boolean",
+    "count",
+    "duration",
+    "rating"
+];
+
 
 /*
 this is the main class to fatch hobbies related data
