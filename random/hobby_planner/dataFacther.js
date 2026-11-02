@@ -1,10 +1,17 @@
 import { start } from 'node:repl';
 import { FAKE_HOBBIES, HOBBY_PLANNER, ACTIVITY_INFO, ACTIVITY_HEATMAP_DATA } from './fakedata.js';
+import { da } from 'zod/locales';
 
-export const MONTHS = [
+export const LONG_MONTHS = [
     'January', 'February', 'March', 'April',
     'May', 'June', 'July', 'August', 'September',
     'October', 'November', 'December',
+];
+
+export const SHORT_MONTHS = [
+    'Jan', 'Feb', 'Mar', 'Apr',
+    'May', 'Jun', 'Jul', 'Aug', 'Sep',
+    'Oct', 'Nov', 'Dec'
 ];
 
 export const VALID_DATA_TYPE = [
@@ -740,6 +747,13 @@ export class HobbyPlannerManager {
         };
     }
 
+    latest_year_and_month() {
+        return (
+            HOBBY_PLANNER.latest_year,
+            HOBBY_PLANNER[HOBBY_PLANNER.latest_year].latestMonth
+        );
+    }
+
     /**
      * Resolves the closest available planner year.
      *
@@ -1006,3 +1020,7 @@ export class HobbyPlannerManager {
         };
     }
 }
+
+
+const data = new HobbyPlannerManager()
+console.log(data.get_with_activity())

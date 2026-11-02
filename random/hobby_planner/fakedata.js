@@ -120,6 +120,7 @@ export const HOBBY_PLANNER = {
 	title: "Hobby Planner",
 	description: "Skills, activities and personal growth manager",
 	nextSectionId: 7,
+	latest_year: 2026,
 
 	data: {
 		2026: {
