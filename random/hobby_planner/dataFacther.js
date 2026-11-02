@@ -1,6 +1,5 @@
-import { date, object } from 'zod';
+import { start } from 'node:repl';
 import { FAKE_HOBBIES, HOBBY_PLANNER, ACTIVITY_INFO, ACTIVITY_HEATMAP_DATA } from './fakedata.js';
-import { da } from 'zod/locales';
 
 export const MONTHS = [
     'January', 'February', 'March', 'April',
@@ -167,7 +166,7 @@ export class ActivityManager {
      *        Only activities matching the specified section IDs
      *        and their corresponding slots will be included.
      */
-    #filterItems({ data, onlyhobbyid, onlysectionid }) {
+    #filterItems({ data, onlyhobbyid = [], onlysectionid = {} }) {
         let result = data;
 
         if (onlyhobbyid.length) {
@@ -642,6 +641,10 @@ export class ActivityHeatmapManager {
  */
 export class HobbyPlannerManager {
 
+    constructor() {
+        this.hobbyactivity = new ActivityManager()
+    }
+
     /**
      * Retrieves the planner state for a specific month and year.
      *
@@ -707,8 +710,34 @@ export class HobbyPlannerManager {
      * @returns {Object}
      *          Planner data along with associated activity information.
      */
-    get_with_activity() {
+    get_with_activity(month = null, year = null) {
+        const planner = this.get(month, year);
 
+        if (!planner) {
+            throw new Error("Cannot generate data: internal error");
+        }
+
+        const onlysectionid = Object.fromEntries(
+            Object.entries(planner.data).map(([sectionid, section]) => [
+                sectionid,
+                Array.from(
+                    { length: section.slotsAllow },
+                    (_, index) => index
+                )
+            ])
+        );
+
+        const activity = this.hobbyactivity.get_by_month(
+            planner.year,
+            0,
+            planner.month,
+            { onlysectionid }
+        );
+
+        return {
+            ...planner,
+            activity
+        };
     }
 
     /**
