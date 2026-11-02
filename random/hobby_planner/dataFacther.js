@@ -1,4 +1,6 @@
+import { date, object } from 'zod';
 import { FAKE_HOBBIES, HOBBY_PLANNER, ACTIVITY_INFO, ACTIVITY_HEATMAP_DATA } from './fakedata.js';
+import { da } from 'zod/locales';
 
 export const MONTHS = [
     'January', 'February', 'March', 'April',
@@ -13,28 +15,116 @@ export const VALID_DATA_TYPE = [
     'rating'
 ];
 
+export const prefefinedcolor = [
+    "#EBEDF0", // Level 0
+    "#9BE9A8", // Level 1
+    "#40C463", // Level 2
+    "#30A14E", // Level 3
+    "#216E39"  // Level 4
+];
 
-/*
-this is the main class to fatch hobbies related data
-this class provide api to fatch those data these provides
-1. get : takes id and return hobbie data
-2. get_childen : retrun childen for that hobbie
-3. get_all : return full data with continues on each 20
+function validatecolor(colors) {
+    if (!Array.isArray(colors)) {
+        throw new TypeError("Colors must be an array.");
+    }
 
-not everything is implemented yet
-*/
+    if (colors.length !== 5) {
+        throw new RangeError("Colors must contain exactly 5 colors.");
+    }
+
+    const hexPattern = /^#(?:[0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/;
+
+    colors.forEach((color, index) => {
+        if (typeof color !== "string" || !hexPattern.test(color)) {
+            throw new TypeError(
+                `Invalid color at index ${index}: ${color}. Expected a valid HEX color.`
+            );
+        }
+    });
+
+    return [...colors];
+}
+
+
+/**
+ * HobbyManager
+ *
+ * Provides a centralized interface for retrieving and managing
+ * hobby-related data.
+ *
+ * Exposes methods to access individual hobbies, retrieve their
+ * child hobbies, and fetch the complete hobby collection.
+ *
+ * All returned data is provided as independent copies to prevent
+ * accidental modifications to the original data source.
+ *
+ * Responsibilities:
+ * - Retrieve an individual hobby by its ID.
+ * - Retrieve all direct child hobbies belonging to a parent hobby.
+ * - Retrieve the complete collection of hobbies.
+ * - Provide a consistent interface for accessing hobby data.
+ *
+ * Public methods:
+ * - `get(hobbyid)`:
+ *   Retrieves a single hobby by its ID.
+ *
+ * - `get_children(hobbyid)`:
+ *   Retrieves all direct children of the specified hobby.
+ *
+ * - `get_all()`:
+ *   Retrieves the complete hobby collection.
+ *
+ * Note:
+ * Not all planned functionality has been implemented yet.
+ *
+ * @class HobbyManager
+ */
 
 export class HobbyManager {
 
+    /**
+     * Retrieves an individual hobby by its ID.
+     *
+     * @param {number|string} hobbyid
+     *        Unique identifier of the requested hobby.
+     *
+     * @returns {Object|null}
+     *          An independent copy of the hobby data,
+     *          or null if the hobby does not exist.
+     */
     get(hobbyid) {
         const result = FAKE_HOBBIES[hobbyid];
         return result ? structuredClone(result) : null;
     }
 
+    /**
+     * Retrieves the complete collection of hobbies.
+     *
+     * Returns an independent copy of the entire hobby dataset.
+     *
+     * @returns {Object}
+     *          An object containing all hobbies, indexed by their IDs.
+     * 
+     * !! does not returnn in chunk yet need implementation
+     */
     get_all() {
         return structuredClone(FAKE_HOBBIES);
     }
 
+    /**
+     * Retrieves all direct child hobbies belonging to a parent hobby.
+     *
+     * Matches hobbies whose parentId corresponds to the supplied
+     * hobby ID.
+     *
+     * @param {number|string} hobbyid
+     *        ID of the parent hobby.
+     *
+     * @returns {Object}
+     *          An object containing matching child hobbies,
+     *          indexed by their IDs. Returns an empty object
+     *          if no children are found.
+     */
     get_children(hobbyid) {
         return Object.fromEntries(
             Object.entries(FAKE_HOBBIES)
@@ -44,18 +134,539 @@ export class HobbyManager {
     }
 }
 
-/*
-this class repersent hobby planner data state for all months
-for all year and its keep track of changes we did in hobbies
-these class provide api such as
+/**
+ * ActivityManager
+ *
+ * Manages and retrieves hobby activity data.
+ *
+ * Provides methods to retrieve activity records by month,
+ * hobby ID, or section ID. Supports optional filtering to
+ * narrow down the returned activity data.
+ *
+ * Filtering can be performed using hobby IDs, section IDs,
+ * and their corresponding slot IDs.
+ *
+ * The class exposes dedicated retrieval methods for different
+ * use cases while keeping the underlying filtering logic private.
+ *
+ * @class ActivityManager
+ */
+export class ActivityManager {
+    /**
+     * Filters activity items based on the provided criteria.
+     *
+     * @param {Object} options
+     * @param {number[]} [options.onlyhobbyid]
+     *        An array of hobby IDs. Only activities belonging
+     *        to the specified hobbies will be included.
+     *
+     * @param {Object<number, number[]>} [options.onlysectionid]
+     *        An object where each key represents a section ID
+     *        and its value is an array of slot IDs.
+     *
+     *        Only activities matching the specified section IDs
+     *        and their corresponding slots will be included.
+     */
+    #filterItems({ data, onlyhobbyid, onlysectionid }) {
+        let result = data;
 
-get: this function takes month and year as input if given its try 
-    to return the closest data avliable from that data to provide hobby
-    planner state if month and year not given its takes curr year and curr month
-    as input
-*/
+        if (onlyhobbyid.length) {
+            result = result.filter(entry =>
+                onlyhobbyid.includes(entry?.id)
+            );
+        }
+
+        if (onlysectionid && Object.keys(onlysectionid).length) {
+            result = result.filter(entry =>
+                onlysectionid[entry?.sectionid]?.includes(entry?.slot) ?? false
+            );
+        }
+
+        return result;
+    }
+
+    /**
+     * Retrieves activity data for a given year and month range.
+     *
+     * Retrieves activities between the specified starting and ending
+     * months (inclusive). Each month's activity data can optionally
+     * be filtered by hobby IDs, section IDs, and their corresponding slots.
+     *
+     * @param {number} year
+     *        Target year (e.g. 2026).
+     *
+     * @param {number} [start=0]
+     *        Starting month index (0–11). Defaults to January.
+     *
+     * @param {number} [end=11]
+     *        Ending month index (0–11). Defaults to December.
+     *
+     * @param {Object|null} [filterobj=null]
+     *        Optional filtering criteria applied to each month's activities.
+     *
+     * @param {number[]} [filterobj.onlyhobbyid]
+     *        Array of hobby IDs to include.
+     *
+     * @param {Object<number, number[]>} [filterobj.onlysectionid]
+     *        Maps section IDs to arrays of slot IDs to include.
+     *
+     * @returns {Object<number, Array>}
+     *          Activity data indexed by month, containing only
+     *          activities matching the specified filters.
+     *
+     * @throws {TypeError}
+     *         If the year or month range contains invalid values.
+     *
+     * @throws {Error}
+     *         If no activity data exists for the requested year
+     *         or month range.
+     */
+    get_by_month(year, start = 0, end = 11, filterobj = null) {
+        const data = ACTIVITY_INFO[year];
+
+        if (!data) {
+            throw new Error(`No activity data available for year ${year}.`);
+        }
+
+        if (
+            !Number.isInteger(start) ||
+            !Number.isInteger(end) ||
+            start < 0 || start > 11 ||
+            end < 0 || end > 11 ||
+            start > end
+        ) {
+            throw new RangeError(
+                "Invalid month range. Expected 0 <= start <= end <= 11."
+            );
+        }
+
+        const result = Object.fromEntries(
+            Object.entries(data)
+                .filter(([month]) => {
+                    const index = Number(month);
+                    return index >= start && index <= end;
+                })
+                .map(([month, activities]) => [
+                    month,
+                    filterobj
+                        ? this.#filterItems({ data: activities, ...filterobj })
+                        : activities
+                ])
+        );
+
+        if (Object.keys(result).length === 0) {
+            throw new Error("No activity data available for the given month range.");
+        }
+
+        return result;
+    }
+
+    /**
+     * Retrieves activity data for a given year, filtered by hobby IDs.
+     *
+     * @param {number} year
+     *        The year to retrieve activities for.
+     *
+     * @param {number[]} hobbyids
+     *        An array of hobby IDs to filter by.
+     *
+     * @returns {Object}
+     *        Activity data belonging to the specified hobbies.
+     */
+    get_by_hobbyid(year, hobbyids) {
+        return this.get_by_month(year, 0, 11, {
+            onlyhobbyid: hobbyids
+        });
+    }
+
+    /**
+     * Retrieves activity data for a given year, filtered by section IDs
+     * and their corresponding slot IDs.
+     *
+     * @param {number} year
+     *        The year to retrieve activities for.
+     *
+     * @param {Object<number, number[]>} sectionids
+     *        An object mapping section IDs to their respective slot IDs.
+     *
+     * @returns {Object}
+     *        Activity data matching the specified sections and slots.
+     */
+    get_by_sectionid(year, sectionids) {
+        return this.get_by_month(year, 0, 11, {
+            onlysectionid: sectionids
+        });
+    }
+}
+
+
+/**
+ * ActivityHeatmapManager
+ *
+ * Manages activity heatmap data and generates formatted heatmap
+ * and graph data for individual hobbies.
+ *
+ * Supports customizable heatmap colors and target-history-based
+ * intensity calculations.
+ *
+ * Public methods:
+ *
+ * @method get
+ * Returns formatted monthly heatmap data for a specific hobby.
+ * Each daily entry includes its date, activity amount, target,
+ * intensity level (0–4), label, and colors.
+ *
+ * @method get_original
+ * Returns a cloned copy of the original, unformatted monthly
+ * heatmap data for a specific hobby.
+ *
+ * @method get_graph
+ * Returns graph data for a specific month and hobby.
+ * Divides daily activity values into the requested number of
+ * segments and calculates the average for each segment.
+ *
+ * @method get_graph_year
+ * Returns graph data for an entire year and hobby.
+ * Combines available monthly activity data, divides it into
+ * the requested number of segments, and calculates the average
+ * for each segment.
+ *
+ * @param {string[]} [colors]
+ * Optional custom palette containing exactly five valid HEX colors,
+ * representing heatmap intensity levels 0–4.
+ */
+export class ActivityHeatmapManager {
+
+    constructor(colors) {
+        this.hobbies = new HobbyManager();
+
+        this.colors = colors
+            ? validatecolor(colors)
+            : [...prefefinedcolor];
+    }
+
+    #buildTargetCache(targetHistory, totalDays) {
+        const cache = [];
+        let targetIndex = 0;
+        let target = null;
+
+        for (let day = 1; day <= totalDays; day++) {
+
+            while (
+                targetIndex < targetHistory.length &&
+                targetHistory[targetIndex].from <= day
+            ) {
+                target = targetHistory[targetIndex].target;
+                targetIndex++;
+            }
+
+            cache.push(target);
+        }
+
+        return cache;
+    }
+
+    #getColor(value) {
+        return this.colors[value];
+    }
+
+    #formatheatmapdata(data, year, month) {
+        return Object.fromEntries(
+            Object.entries(data).map(([hobbyid, entry]) => {
+
+                const targetCache = this.#buildTargetCache(
+                    entry.targetHistory,
+                    entry.values.length
+                );
+
+                return [
+                    hobbyid,
+                    entry.values.map((amount, index) => {
+                        const day = index + 1;
+                        const date = [
+                            year,
+                            String(month + 1).padStart(2, "0"),
+                            String(day).padStart(2, "0")
+                        ].join("-");
+
+                        return this.#formatheatmapentries(
+                            hobbyid,
+                            date,
+                            amount,
+                            targetCache[index]
+                        );
+                    })
+                ];
+            })
+        );
+    }
+
+    #formatheatmapentries(hobbyid, date, amount, target) {
+        const hobbydata = this.hobbies.get(hobbyid);
+
+        if (!hobbydata) {
+            throw new Error(`Hobby not found: ${hobbyid}`);
+        }
+
+        target ??= hobbydata.target;
+
+        // Calculate intensity (0–4).
+        const ratio = target > 0 ? amount / target : 0;
+
+        const value =
+            amount <= 0 ? 0 :
+                ratio <= 0.25 ? 1 :
+                    ratio <= 0.50 ? 2 :
+                        ratio <= 0.75 ? 3 : 4;
+
+        // Generate label.
+        let label;
+
+        switch (hobbydata.unit_type) {
+            case "boolean":
+                label = amount > 0 ? "Done" : "Not done";
+                break;
+
+            case "count":
+            case "duration":
+                label = `${amount}/${target} ${hobbydata.unit_name}`;
+                break;
+
+            case "rating":
+                label = `${amount}/${target}`;
+                break;
+
+            default:
+                label = String(amount);
+        }
+
+        return {
+            date,
+            value,
+            amount,
+            target,
+            label,
+            color: this.#getColor(value),
+            labelColor: hobbydata.color
+        };
+    }
+
+    #buildGraph(data, points) {
+        if (!Number.isInteger(points) || points < 1) {
+            throw new RangeError("Points must be a positive integer.");
+        }
+
+        const totalDays = data.length;
+
+        if (totalDays === 0) {
+            return Array(points).fill(0);
+        }
+
+        const result = [];
+
+        for (let i = 0; i < points; i++) {
+            const start = Math.floor(i * totalDays / points);
+            const end = Math.floor((i + 1) * totalDays / points);
+
+            const segment = data.slice(start, end);
+
+            const average = segment.length
+                ? segment.reduce((sum, value) => sum + value, 0) / segment.length
+                : 0;
+
+            result.push(Number(average.toFixed(2)));
+        }
+
+        return result;
+    }
+
+    /**
+     * Returns the original, unformatted heatmap data.
+     *
+     * @param {number} year - Full year.
+     * @param {number} month - Zero-based month index (0–11).
+     * @param {string} hobbyid - Hobby identifier.
+     * @returns {Object} Cloned original activity data.
+     */
+    get_original(year, month, hobbyid) {
+        const yearData = ACTIVITY_HEATMAP_DATA[year];
+
+        if (!yearData) {
+            throw new Error(`No data available for year ${year}.`);
+        }
+
+        if (!Number.isInteger(month) || month < 0 || month > 11) {
+            throw new RangeError("Month must be an integer between 0 and 11.");
+        }
+
+        const result = yearData[month]?.[hobbyid];
+
+        if (!result) {
+            throw new Error(`No heatmap data available for hobby ${hobbyid}.`);
+        }
+
+        return structuredClone(result);
+    }
+
+    /**
+     * Returns formatted heatmap data for a specific hobby and month.
+     *
+     * @param {number} year - Full year (e.g. 2026).
+     * @param {number} month - Zero-based month index (0–11).
+     * @param {string} hobbyid - Hobby identifier.
+     * @returns {Object} Formatted heatmap data keyed by hobby ID.
+     */
+    get(year, month, hobbyid) {
+        const data = this.get_original(year, month, hobbyid);
+
+        return this.#formatheatmapdata(
+            { [hobbyid]: data },
+            year,
+            month
+        )
+    }
+
+    /**
+     * Generates graph data for a specific month.
+     *
+     * @param {number} year - Full year.
+     * @param {number} month - Zero-based month index (0–11).
+     * @param {string} hobbyid - Hobby identifier.
+     * @param {number} [points=10] - Number of graph points to generate.
+     * @returns {Object} Graph data containing hobby color and averaged values.
+     */
+    get_graph(year, month, hobbyid, points = 10) {
+        const original = this.get_original(year, month, hobbyid);
+        const hobby = this.hobbies.get(hobbyid);
+
+        if (!hobby) {
+            throw new Error(`Hobby not found: ${hobbyid}`);
+        }
+
+        return {
+            [hobbyid]: {
+                color: hobby.color,
+                values: this.#buildGraph(original.values, points)
+            }
+        };
+    }
+
+
+    /**
+     * Generates graph data for an entire year.
+     *
+     * @param {number} year - Full year.
+     * @param {string} hobbyid - Hobby identifier.
+     * @param {number} [points=10] - Number of graph points to generate.
+     * @returns {Object} Graph data containing hobby color and averaged values.
+    */
+    get_graph_year(year, hobbyid, points = 10) {
+        const yearData = ACTIVITY_HEATMAP_DATA[year];
+
+        if (!yearData) {
+            throw new Error(`No data available for year ${year}.`);
+        }
+
+        const hobby = this.hobbies.get(hobbyid);
+
+        if (!hobby) {
+            throw new Error(`Hobby not found: ${hobbyid}`);
+        }
+
+        const values = [];
+
+        for (let month = 0; month < 12; month++) {
+            const monthData = yearData[month]?.[hobbyid];
+
+            if (!monthData) continue;
+
+            values.push(...monthData.values);
+        }
+
+        return {
+            [hobbyid]: {
+                color: hobby.color,
+                values: this.#buildGraph(values, points)
+            }
+        };
+    }
+}
+
+
+/**
+ * HobbyPlannerManager
+ *
+ * Manages the retrieval and reconstruction of Hobby Planner data
+ * for a specific month and year.
+ *
+ * Uses the latest available snapshot and the recorded monthly changes
+ * to reconstruct the planner's state at a requested point in time.
+ *
+ * The manager automatically resolves the closest available year and
+ * month when the requested values are not directly available.
+ *
+ * Responsibilities:
+ * - Retrieve planner data for a specific month and year.
+ * - Resolve the closest available year and month.
+ * - Reconstruct historical planner states by reversing recorded changes.
+ * - Restore section data and display order when reconstructing history.
+ * - Return a structured and independent copy of the requested planner data.
+ * - Provide an interface for retrieving planner data alongside activity data.
+ *
+ * Historical reconstruction supports the following change actions:
+ * - `create`: Removes the section when reversing its creation.
+ * - `update`: Restores the section's previous state.
+ * - `delete`: Restores the deleted section and its original position.
+ *
+ * Public methods:
+ * - `get(month, year)`:
+ *   Retrieves planner data for the requested month and year.
+ *
+ * - `get_with_activity()`:
+ *   Retrieves planner data together with its associated activity data.
+ *
+ * Internal methods:
+ * - `#closestYear(year)`:
+ *   Resolves the closest available planner year.
+ *
+ * - `#closestmonth(month, year)`:
+ *   Resolves the closest available month within the selected year.
+ *
+ * - `#getPreviousState(year_data, target_month)`:
+ *   Reconstructs a historical planner state by reversing monthly changes.
+ *
+ * - `#packData(month_data, order, year, month)`:
+ *   Packages the planner data into a structured response.
+ *
+ * @class HobbyPlannerManager
+ */
 export class HobbyPlannerManager {
 
+    /**
+     * Retrieves the planner state for a specific month and year.
+     *
+     * Resolves the closest available year and month, then retrieves
+     * the corresponding planner state using either the latest snapshot
+     * or historical state reconstruction.
+     *
+     * @param {number|null} [month=null]
+     *        Target month (0–11, where 0 represents January).
+     *        Defaults to the current month.
+     *
+     * @param {number|null} [year=null]
+     *        Target year (e.g. 2026).
+     *        Defaults to the current year.
+     *
+     * @returns {Object}
+     *          An independent copy of the planner state containing
+     *          title, description, year, month, data, and order.
+     *
+     * @throws {TypeError}
+     *         If the provided year or month is invalid.
+     *
+     * @throws {Error}
+     *         If no planner data or available months exist.
+     */
     get(month = null, year = null) {
         const target_year = this.#closestYear(year);
         const target_month = this.#closestmonth(month, target_year);
@@ -87,10 +698,38 @@ export class HobbyPlannerManager {
         );
     }
 
+    /**
+     * Retrieves planner data together with its associated activity data.
+     *
+     * Combines the reconstructed planner state with activity records
+     * for the corresponding month and year.
+     *
+     * @returns {Object}
+     *          Planner data along with associated activity information.
+     */
     get_with_activity() {
 
     }
 
+    /**
+     * Resolves the closest available planner year.
+     *
+     * If no year is provided, the current year is used.
+     * When the requested year is unavailable, the closest
+     * existing year is selected.
+     *
+     * @param {number|null} year
+     *        Requested year.
+     *
+     * @returns {number}
+     *          The closest available planner year.
+     *
+     * @throws {TypeError}
+     *         If the provided year is not an integer.
+     *
+     * @throws {Error}
+     *         If no planner years are available.
+     */
     #closestYear(year) {
         if (year == null) {
             year = new Date().getFullYear();
@@ -113,6 +752,28 @@ export class HobbyPlannerManager {
         );
     }
 
+    /**
+     * Resolves the closest available month within a given year.
+     *
+     * If no month is provided, the current month is used.
+     * Selects the latest available month that is less than
+     * or equal to the requested month.
+     *
+     * @param {number|null} month
+     *        Requested month (0–11).
+     *
+     * @param {number} year
+     *        Year in which the month should be resolved.
+     *
+     * @returns {number}
+     *          The closest available month.
+     *
+     * @throws {TypeError}
+     *         If the provided month is not an integer between 0 and 11.
+     *
+     * @throws {Error}
+     *         If no planner data or available months exist for the year.
+     */
     #closestmonth(month, year) {
         month ??= new Date().getMonth();
         const year_data = HOBBY_PLANNER.data[year];
@@ -156,6 +817,32 @@ export class HobbyPlannerManager {
         return closest;
     }
 
+    /**
+     * Reconstructs a historical planner state by reversing
+     * the changes recorded after the target month.
+     *
+     * Starts with the latest snapshot and reverses monthly changes
+     * in descending chronological order.
+     *
+     * Supported change actions:
+     * - `update`: Restores the previous section data.
+     * - `create`: Removes the newly created section.
+     * - `delete`: Restores the deleted section and its original position.
+     *
+     * @param {Object} year_data
+     *        Planner data containing the latest snapshot, display order,
+     *        latest month, and recorded monthly changes.
+     *
+     * @param {number} target_month
+     *        Target month to reconstruct (0–11).
+     *
+     * @returns {{data: Object, order: string[]}}
+     *          Reconstructed section data and its display order.
+     *
+     * @throws {Error}
+     *         If the snapshot, target month, or recorded changes are invalid,
+     *         or if a change cannot be reversed.
+     */
     #getPreviousState(year_data, target_month) {
         const latest_month = year_data.latestMonth;
 
@@ -251,6 +938,34 @@ export class HobbyPlannerManager {
         };
     }
 
+    /**
+     * Packages planner data into a structured response.
+     *
+     * Creates independent copies of the supplied section data
+     * and display order to prevent modifications to the original
+     * planner state.
+     *
+     * @param {Object} month_data
+     *        Section data for the requested month.
+     *
+     * @param {string[]} order
+     *        Display order of section IDs.
+     *
+     * @param {number} year
+     *        Resolved planner year.
+     *
+     * @param {number} month
+     *        Resolved planner month (0–11).
+     *
+     * @returns {Object}
+     *          Packaged planner data containing:
+     *          - title
+     *          - description
+     *          - year
+     *          - month
+     *          - data
+     *          - order
+     */
     #packData(month_data, order, year, month) {
         return {
             title: HOBBY_PLANNER.title,
@@ -262,7 +977,3 @@ export class HobbyPlannerManager {
         };
     }
 }
-
-export class ActivityManager { }
-
-export class ActivityHeatmapManager { }
