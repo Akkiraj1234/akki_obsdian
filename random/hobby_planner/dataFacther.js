@@ -1,6 +1,4 @@
-import { start } from 'node:repl';
 import { FAKE_HOBBIES, HOBBY_PLANNER, ACTIVITY_INFO, ACTIVITY_HEATMAP_DATA } from './fakedata.js';
-import { da } from 'zod/locales';
 
 export const LONG_MONTHS = [
     'January', 'February', 'March', 'April',
@@ -750,7 +748,7 @@ export class HobbyPlannerManager {
     latest_year_and_month() {
         return (
             HOBBY_PLANNER.latest_year,
-            HOBBY_PLANNER[HOBBY_PLANNER.latest_year].latestMonth
+            HOBBY_PLANNER.data[HOBBY_PLANNER.latest_year].latestMonth
         );
     }
 
@@ -1020,7 +1018,3 @@ export class HobbyPlannerManager {
         };
     }
 }
-
-
-const data = new HobbyPlannerManager()
-console.log(data.get_with_activity())
