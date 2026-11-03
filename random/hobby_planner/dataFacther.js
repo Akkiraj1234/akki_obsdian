@@ -27,6 +27,26 @@ export const prefefinedcolor = [
     "#216E39"  // Level 4
 ];
 
+
+/**
+ * Validates an array of exactly five HEX color values.
+ *
+ * Each color must be a string in either 3-digit or 6-digit HEX format,
+ * starting with `#` (e.g. `#FFF` or `#FFFFFF`).
+ *
+ * @param {string[]} colors
+ *        An array containing exactly five valid HEX color values.
+ *
+ * @throws {TypeError}
+ *         If `colors` is not an array, or if any element is not a
+ *         valid HEX color string.
+ *
+ * @throws {RangeError}
+ *         If the array does not contain exactly five colors.
+ *
+ * @returns {string[]}
+ *          A shallow copy of the validated color array.
+ */
 function validatecolor(colors) {
     if (!Array.isArray(colors)) {
         throw new TypeError("Colors must be an array.");
@@ -47,6 +67,63 @@ function validatecolor(colors) {
     });
 
     return [...colors];
+}
+
+/**
+ * Generates a section and slot filter from planner data.
+ *
+ * Includes every allowed slot for each planner section.
+ *
+ * @param {Object} plannerData
+ *        Planner sections keyed by section ID.
+ *
+ * @returns {Object<string, number[]>}
+ *          Section IDs mapped to their allowed slot IDs.
+ */
+export function getSectionIdFilterByPlanner(plannerData) {
+    return Object.fromEntries(
+        Object.entries(plannerData).map(([sectionId, section]) => [
+            sectionId,
+            Array.from(
+                { length: section.slotsAllow },
+                (_, index) => index
+            )
+        ])
+    );
+}
+
+/**
+ * Generates a hobby ID filter from planner activity data.
+ *
+ * Collects unique hobby IDs from activity records associated
+ * with the supplied planner.
+ *
+ * Activity data must be provided either:
+ * - Through the result of HobbyPlannerManager.get_with_activity().
+ * - As a separate activity data object.
+ *
+ * @param {Object} plannerData
+ *        Planner data containing its associated activity property,
+ *        or planner data accompanied by separately supplied activity.
+ *
+ * @param {Object<number, Array>} [activityData]
+ *        Optional activity records indexed by month.
+ *        Provide this when activity data is not included in plannerData.
+ *
+ * @returns {string[]}
+ *          An array of unique hobby IDs found in the activity records.
+ */
+export function getHobbyIdFilterByPlanner(plannerData, activityData = null) {
+    const activities = activityData ?? plannerData.activity;
+    const hobbyIds = new Set();
+
+    for (const monthActivities of Object.values(activities)) {
+        for (const activity of monthActivities) {
+            hobbyIds.add(activity.id);
+        }
+    }
+
+    return [...hobbyIds];
 }
 
 
@@ -225,10 +302,11 @@ export class ActivityManager {
      *         If no activity data exists for the requested year
      *         or month range.
      */
-    get_by_month(year, start = 0, end = 11, filterobj = null) {
+    get_by_month(year, start = 0, end = 11, filterobj = null, error = false) {
         const data = ACTIVITY_INFO[year];
 
         if (!data) {
+            if (!error) return {}
             throw new Error(`No activity data available for year ${year}.`);
         }
 
@@ -259,6 +337,7 @@ export class ActivityManager {
         );
 
         if (Object.keys(result).length === 0) {
+            if (!error) return {}
             throw new Error("No activity data available for the given month range.");
         }
 
@@ -1018,3 +1097,7 @@ export class HobbyPlannerManager {
         };
     }
 }
+
+
+const daa = new HobbyPlannerManager();
+console.log(daa.get());
