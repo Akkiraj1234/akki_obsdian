@@ -394,8 +394,9 @@ test("ActivityManager", async t => {
     });
 
     await t.test("rejects a year without activity data", () => {
+        assert.deepStrictEqual(activityManager.get_by_month(2025), {});
         assert.throws(
-            () => activityManager.get_by_month(2025),
+            () => activityManager.get_by_month(2025, 0, 11, null, { throwOnEmpty: true }),
             /No activity data available for year 2025/
         );
     });
@@ -451,19 +452,25 @@ test("ActivityManager", async t => {
         assert.deepStrictEqual(result["3"], []);
     });
 
-    await t.test("does not expose source records through unfiltered results", t => {
-        const source = ACTIVITY_INFO[2026][0][0];
-        const originalId = source.id;
-        const result = activityManager.get_by_month(2026, 0, 0);
-
-        try {
-            result["0"][0].id = "__mutated__";
-            skipExpectedFailure(t, "unfiltered activity results currently share source records", () => {
-                assert.equal(source.id, originalId);
-            });
-        } finally {
-            source.id = originalId;
-        }
+    await t.test("throwOnEmpty rejects filters with no matching activity", () => {
+        assert.throws(
+            () => activityManager.get_by_month(
+                2026,
+                2,
+                3,
+                { onlyhobbyid: ["__missing__"] },
+                { throwOnEmpty: true }
+            ),
+            /No activity data available.*filters/
+        );
+        assert.throws(
+            () => activityManager.get_by_hobbyid(
+                2026,
+                ["__missing__"],
+                { throwOnEmpty: true }
+            ),
+            /No activity data available.*filters/
+        );
     });
 
     await t.test("empty filter returns every activity", () => {
@@ -499,15 +506,15 @@ test("ActivityManager", async t => {
         }
     });
 
-    await t.test("rejects an invalid year type with a useful error", t => {
-        skipExpectedFailure(t, "numeric-string years are currently accepted", () => {
-            for (const year of [null, "2026", {}, []]) {
-                assert.throws(
-                    () => activityManager.get_by_month(year),
-                    /No activity data available for year/
-                );
-            }
-        });
+    await t.test("accepts numeric-string years and returns empty for unknown keys", () => {
+        assert.deepStrictEqual(
+            activityManager.get_by_month("2026"),
+            activityManager.get_by_month(2026)
+        );
+
+        for (const year of [null, {}, []]) {
+            assert.deepStrictEqual(activityManager.get_by_month(year), {});
+        }
     });
 
     await t.test("sparse activity months preserve only available month keys", () => {
@@ -896,7 +903,7 @@ test("HobbyPlannerManager", async t => {
 
         for (const year of invalidYears) {
             assert.throws(
-                () => plannerManager.get(0, year),
+                () => plannerManager.get(year, 0),
                 TypeError
             );
         }
@@ -919,7 +926,7 @@ test("HobbyPlannerManager", async t => {
 
         for (const month of invalidMonths) {
             assert.throws(
-                () => plannerManager.get(month, availableYears[0]),
+                () => plannerManager.get(availableYears[0], month),
                 TypeError
             );
         }
@@ -931,13 +938,13 @@ test("HobbyPlannerManager", async t => {
 
     await t.test("accepts month zero", () => {
         assert.doesNotThrow(() =>
-            plannerManager.get(0, availableYears[0])
+            plannerManager.get(availableYears[0], 0)
         );
     });
 
     await t.test("accepts month eleven", () => {
         assert.doesNotThrow(() =>
-            plannerManager.get(11, availableYears[0])
+            plannerManager.get(availableYears[0], 11)
         );
     });
 
@@ -972,7 +979,7 @@ test("HobbyPlannerManager", async t => {
     await t.test("selects exact available year", () => {
         const year = availableYears[0];
 
-        const result = plannerManager.get(0, year);
+        const result = plannerManager.get(year, 0);
 
         assert.equal(result.year, year);
     });
@@ -980,7 +987,7 @@ test("HobbyPlannerManager", async t => {
     await t.test("selects closest available year", () => {
         const requestedYear = availableYears[0] - 100;
 
-        const result = plannerManager.get(0, requestedYear);
+        const result = plannerManager.get(requestedYear, 0);
 
         assert.equal(
             result.year,
@@ -1003,7 +1010,7 @@ test("HobbyPlannerManager", async t => {
 
         const requestedYear = years[0] + gap / 2;
 
-        const result = plannerManager.get(0, requestedYear);
+        const result = plannerManager.get(requestedYear, 0);
 
         assert.equal(
             result.year,
@@ -1020,7 +1027,7 @@ test("HobbyPlannerManager", async t => {
         const year = availableYears[0];
         const months = getAvailableMonths(HOBBY_PLANNER.data[year]);
 
-        const result = plannerManager.get(months[0], year);
+        const result = plannerManager.get(year, months[0]);
 
         assert.equal(result.month, months[0]);
     });
@@ -1043,7 +1050,7 @@ test("HobbyPlannerManager", async t => {
             return t.skip("No missing month between available months.");
         }
 
-        const result = plannerManager.get(first + 1, year);
+        const result = plannerManager.get(year, first + 1);
 
         assert.equal(result.month, first);
     });
@@ -1052,7 +1059,7 @@ test("HobbyPlannerManager", async t => {
         const year = availableYears[0];
         const months = getAvailableMonths(HOBBY_PLANNER.data[year]);
 
-        const result = plannerManager.get(0, year);
+        const result = plannerManager.get(year, 0);
 
         const expected = months[0] === 0
             ? months[0]
@@ -1065,7 +1072,7 @@ test("HobbyPlannerManager", async t => {
         const year = availableYears[0];
         const months = getAvailableMonths(HOBBY_PLANNER.data[year]);
 
-        const result = plannerManager.get(11, year);
+        const result = plannerManager.get(year, 11);
 
         assert.equal(result.month, months[months.length - 1]);
     });
@@ -1079,7 +1086,7 @@ test("HobbyPlannerManager", async t => {
         const year = availableYears[0];
         const yearData = HOBBY_PLANNER.data[year];
 
-        const result = plannerManager.get(yearData.latestMonth, year);
+        const result = plannerManager.get(year, yearData.latestMonth);
 
         assert.deepStrictEqual(result.data, yearData.latest);
         assert.deepStrictEqual(result.order, yearData.order);
@@ -1096,7 +1103,7 @@ test("HobbyPlannerManager", async t => {
 
         const yearData = HOBBY_PLANNER.data[year];
 
-        const result = plannerManager.get(11, year);
+        const result = plannerManager.get(year, 11);
 
         assert.deepStrictEqual(result.data, yearData.latest);
         assert.deepStrictEqual(result.order, yearData.order);
@@ -1122,7 +1129,7 @@ test("HobbyPlannerManager", async t => {
         const target = getAvailableMonths(yearData)
             .find(m => m < yearData.latestMonth);
 
-        const result = plannerManager.get(target, year);
+        const result = plannerManager.get(year, target);
 
         assert.equal(result.year, year);
         assert.equal(result.month, target);
@@ -1136,7 +1143,7 @@ test("HobbyPlannerManager", async t => {
         });
 
         withTemporaryPlanner(2060, fixture, () => {
-            assert.throws(() => plannerManager.get(0, 2060), /Unknown action "rename"/);
+            assert.throws(() => plannerManager.get(2060, 0), /Unknown action "rename"/);
         });
     });
 
@@ -1149,10 +1156,10 @@ test("HobbyPlannerManager", async t => {
         });
 
         withTemporaryPlanner(2061, updateFixture, () => {
-            assert.throws(() => plannerManager.get(0, 2061), /Cannot reverse update: section missing is missing/);
+            assert.throws(() => plannerManager.get(2061, 0), /Cannot reverse update: section missing is missing/);
         });
         withTemporaryPlanner(2062, createFixture, () => {
-            assert.throws(() => plannerManager.get(0, 2062), /Cannot reverse creation: section missing is missing/);
+            assert.throws(() => plannerManager.get(2062, 0), /Cannot reverse creation: section missing is missing/);
         });
     });
 
@@ -1162,7 +1169,7 @@ test("HobbyPlannerManager", async t => {
         });
 
         withTemporaryPlanner(2063, fixture, () => {
-            assert.throws(() => plannerManager.get(0, 2063), /Cannot reverse deletion: section 1 already exists/);
+            assert.throws(() => plannerManager.get(2063, 0), /Cannot reverse deletion: section 1 already exists/);
         });
     });
 
@@ -1177,10 +1184,10 @@ test("HobbyPlannerManager", async t => {
         });
 
         withTemporaryPlanner(2064, updateFixture, () => {
-            assert.throws(() => plannerManager.get(0, 2064), /Missing previous data for section 1/);
+            assert.throws(() => plannerManager.get(2064, 0), /Missing previous data for section 1/);
         });
         withTemporaryPlanner(2065, deleteFixture, () => {
-            assert.throws(() => plannerManager.get(0, 2065), /Missing previous data for deleted section 1/);
+            assert.throws(() => plannerManager.get(2065, 0), /Missing previous data for deleted section 1/);
         });
     });
 
@@ -1200,7 +1207,7 @@ test("HobbyPlannerManager", async t => {
         });
 
         withTemporaryPlanner(2066, fixture, () => {
-            const result = plannerManager.get(0, 2066);
+            const result = plannerManager.get(2066, 0);
 
             assert.deepStrictEqual(result.order, ["1", "2"]);
             assert.equal(result.data["2"].title, "Restored");
@@ -1213,7 +1220,7 @@ test("HobbyPlannerManager", async t => {
 
         withTemporaryPlanner(2067, fixture, () => {
             skipExpectedFailure(t, "missing latest snapshots currently return incomplete planner data", () => {
-                assert.throws(() => plannerManager.get(0, 2067), /latest snapshot|latest data/i);
+                assert.throws(() => plannerManager.get(2067, 0), /latest snapshot|latest data/i);
             });
         });
     });
@@ -1223,7 +1230,7 @@ test("HobbyPlannerManager", async t => {
         delete fixture.order;
 
         withTemporaryPlanner(2068, fixture, () => {
-            assert.throws(() => plannerManager.get(1, 2068), /order|iterable/i);
+            assert.throws(() => plannerManager.get(2068, 1), /order|iterable/i);
         });
     });
 
@@ -1231,7 +1238,7 @@ test("HobbyPlannerManager", async t => {
         const fixture = createPlannerFixture({ latestMonth: 12 });
 
         withTemporaryPlanner(2069, fixture, () => {
-            assert.throws(() => plannerManager.get(0, 2069), /month/i);
+            assert.throws(() => plannerManager.get(2069, 0), /month/i);
         });
     });
 
@@ -1242,7 +1249,7 @@ test("HobbyPlannerManager", async t => {
         });
 
         withTemporaryPlanner(2070, fixture, () => {
-            assert.deepStrictEqual(plannerManager.get(0, 2070).data, fixture.latest);
+            assert.deepStrictEqual(plannerManager.get(2070, 0).data, fixture.latest);
         });
     });
 
@@ -1257,7 +1264,7 @@ test("HobbyPlannerManager", async t => {
         });
 
         withTemporaryPlanner(2071, fixture, () => {
-            const result = plannerManager.get(1, 2071);
+            const result = plannerManager.get(2071, 1);
 
             assert.deepStrictEqual(result.data["1"], { title: "Initial", slotsAllow: 1 });
         });
@@ -1267,7 +1274,7 @@ test("HobbyPlannerManager", async t => {
         const fixture = createPlannerFixture({ latestMonth: 5, changes: {} });
 
         withTemporaryPlanner(2072, fixture, () => {
-            const result = plannerManager.get(0, 2072);
+            const result = plannerManager.get(2072, 0);
 
             assert.equal(result.month, 5);
             assert.deepStrictEqual(result.data, fixture.latest);
@@ -1281,7 +1288,7 @@ test("HobbyPlannerManager", async t => {
         const original = structuredClone(fixture);
 
         withTemporaryPlanner(2073, fixture, () => {
-            const result = plannerManager.get(1, 2073);
+            const result = plannerManager.get(2073, 1);
 
             result.data["1"].metadata.color = "blue";
             result.order.push("new-section");
@@ -1290,13 +1297,13 @@ test("HobbyPlannerManager", async t => {
     });
 
     await t.test("reverses update, create, and delete changes with section order", () => {
-        const afterCreateAndUpdateReversal = plannerManager.get(8, 2026);
+        const afterCreateAndUpdateReversal = plannerManager.get(2026, 8);
         assert.deepStrictEqual(afterCreateAndUpdateReversal.order, ["1", "2", "4"]);
         assert.equal(afterCreateAndUpdateReversal.data["1"].title, "Main Skills");
         assert.equal(afterCreateAndUpdateReversal.data["1"].slotsAllow, 3);
         assert.equal(Object.hasOwn(afterCreateAndUpdateReversal.data, "5"), false);
 
-        const afterDeleteReversal = plannerManager.get(7, 2026);
+        const afterDeleteReversal = plannerManager.get(2026, 7);
         assert.deepStrictEqual(afterDeleteReversal.order, ["1", "2", "3", "4"]);
         assert.deepStrictEqual(afterDeleteReversal.data["3"], {
             title: "Fitness",
@@ -1306,11 +1313,11 @@ test("HobbyPlannerManager", async t => {
             modifiedAt: "2026-03"
         });
 
-        const beforeSectionFourWasCreated = plannerManager.get(4, 2026);
+        const beforeSectionFourWasCreated = plannerManager.get(2026, 4);
         assert.deepStrictEqual(beforeSectionFourWasCreated.order, ["1", "2", "3"]);
         assert.equal(Object.hasOwn(beforeSectionFourWasCreated.data, "4"), false);
 
-        const initialState = plannerManager.get(0, 2026);
+        const initialState = plannerManager.get(2026, 0);
         assert.deepStrictEqual(initialState.order, ["1", "2", "3"]);
         assert.equal(initialState.data["1"].title, "Main Skills");
         assert.equal(initialState.data["1"].slotsAllow, 2);
@@ -1323,7 +1330,7 @@ test("HobbyPlannerManager", async t => {
         const yearData = HOBBY_PLANNER.data[year];
 
         const original = structuredClone(yearData.latest);
-        const result = plannerManager.get(yearData.latestMonth, year);
+        const result = plannerManager.get(year, yearData.latestMonth);
 
         result.data.__testMutation = true;
         result.order.push("__testMutation");
@@ -1350,7 +1357,7 @@ test("HobbyPlannerManager", async t => {
         const target = getAvailableMonths(yearData)
             .find(m => m < yearData.latestMonth);
 
-        const result = plannerManager.get(target, year);
+        const result = plannerManager.get(year, target);
 
         result.data.__testMutation = true;
         result.order.push("__testMutation");
@@ -1379,15 +1386,15 @@ test("HobbyPlannerManager", async t => {
     });
 
     await t.test("get_with_activity returns planner and activity through requested month", () => {
-        const result = plannerManager.get_with_activity(3, 2026);
+        const result = plannerManager.get_with_activity(2026, 3);
 
         assert.equal(result.year, 2026);
         assert.equal(result.month, 2);
         assert.deepStrictEqual(result, {
-            ...plannerManager.get(3, 2026),
+            ...plannerManager.get(2026, 3),
             activity: activityManager.get_by_month(2026, 0, result.month, {
                 onlysectionid: Object.fromEntries(
-                    Object.entries(plannerManager.get(3, 2026).data).map(([sectionid, section]) => [
+                    Object.entries(plannerManager.get(2026, 3).data).map(([sectionid, section]) => [
                         sectionid,
                         Array.from({ length: section.slotsAllow }, (_, index) => index)
                     ])
@@ -1398,7 +1405,7 @@ test("HobbyPlannerManager", async t => {
     });
 
     await t.test("get_with_activity only includes valid current planner slots", () => {
-        const result = plannerManager.get_with_activity(9, 2026);
+        const result = plannerManager.get_with_activity(2026, 9);
 
         assert.deepStrictEqual(result.order, ["1", "2", "4", "5"]);
         assert.deepStrictEqual(Object.keys(result.activity), [
@@ -1414,11 +1421,13 @@ test("HobbyPlannerManager", async t => {
         }
     });
 
-    await t.test("get_with_activity rejects years without activity data", () => {
-        assert.throws(
-            () => plannerManager.get_with_activity(0, 2025),
-            /No activity data available for year 2025/
-        );
+    await t.test("get_with_activity returns empty activity when the selected year has none", () => {
+        withPlannerFixture(2025, createPlannerFixture(), {}, () => {
+            assert.deepStrictEqual(
+                plannerManager.get_with_activity(2025, 0).activity,
+                {}
+            );
+        });
     });
 
     await t.test("zero-section planner returns empty activity for each available month", t => {
@@ -1429,7 +1438,7 @@ test("HobbyPlannerManager", async t => {
         };
 
         withPlannerFixture(2080, fixture, activity, () => {
-            const result = plannerManager.get_with_activity(1, 2080);
+            const result = plannerManager.get_with_activity(2080, 1);
 
             assert.deepStrictEqual(result.order, []);
             assert.deepStrictEqual(result.data, {});
@@ -1446,7 +1455,7 @@ test("HobbyPlannerManager", async t => {
         const activity = { 0: [{ id: "hobby-coding", sectionid: 1, slot: 0 }] };
 
         withPlannerFixture(2081, fixture, activity, () => {
-            const result = plannerManager.get_with_activity(1, 2081);
+            const result = plannerManager.get_with_activity(2081, 1);
 
             assert.deepStrictEqual(result.activity["0"], []);
         });
@@ -1460,7 +1469,7 @@ test("HobbyPlannerManager", async t => {
         const activity = { 0: [{ id: "hobby-coding", sectionid: 1, slot: 0 }] };
 
         withPlannerFixture(2090, fixture, activity, () => {
-            const result = plannerManager.get_with_activity(1, 2090);
+            const result = plannerManager.get_with_activity(2090, 1);
 
             assert.deepStrictEqual(result.activity["0"], []);
         });
@@ -1479,7 +1488,7 @@ test("HobbyPlannerManager", async t => {
         };
 
         withPlannerFixture(2082, fixture, activity, () => {
-            const result = plannerManager.get_with_activity(1, 2082);
+            const result = plannerManager.get_with_activity(2082, 1);
 
             assert.deepStrictEqual(result.activity["0"].map(entry => entry.id), ["hobby-coding"]);
         });
@@ -1506,8 +1515,8 @@ test("HobbyPlannerManager", async t => {
         };
 
         withPlannerFixture(2083, fixture, activity, () => {
-            const historical = plannerManager.get_with_activity(0, 2083);
-            const latest = plannerManager.get_with_activity(1, 2083);
+            const historical = plannerManager.get_with_activity(2083, 0);
+            const latest = plannerManager.get_with_activity(2083, 1);
 
             assert.equal(historical.data["1"].slotsAllow, 2);
             assert.deepStrictEqual(historical.activity["0"].map(entry => entry.slot), [0, 1]);
@@ -1522,7 +1531,7 @@ test("HobbyPlannerManager", async t => {
         const activity = { 0: [source] };
 
         withPlannerFixture(2084, fixture, activity, () => {
-            const result = plannerManager.get_with_activity(0, 2084);
+            const result = plannerManager.get_with_activity(2084, 0);
 
             try {
                 result.activity["0"][0].id = "__mutated__";
@@ -1542,8 +1551,8 @@ test("HobbyPlannerManager", async t => {
             { 0: [{ id: "hobby-coding", sectionid: 1, slot: 0 }] },
             () => {
                 assert.deepStrictEqual(
-                    plannerManager.get_with_activity(0, 2085),
-                    plannerManager.get_with_activity(0, 2085)
+                    plannerManager.get_with_activity(2085, 0),
+                    plannerManager.get_with_activity(2085, 0)
                 );
             }
         );
@@ -1562,7 +1571,7 @@ test("HobbyPlannerManager", async t => {
         };
 
         withPlannerFixture(2086, fixture, activity, () => {
-            const result = plannerManager.get_with_activity(1, 2086);
+            const result = plannerManager.get_with_activity(2086, 1);
 
             assert.deepStrictEqual(result.activity["0"].map(entry => entry.slot), [0]);
         });
@@ -1584,7 +1593,7 @@ test("HobbyPlannerManager", async t => {
         };
 
         withPlannerFixture(2091, fixture, activity, () => {
-            const result = plannerManager.get_with_activity(1, 2091);
+            const result = plannerManager.get_with_activity(2091, 1);
 
             assert.deepStrictEqual(
                 result.activity["0"].map(({ id, sectionid, slot }) => ({ id, sectionid, slot })),
@@ -1605,7 +1614,7 @@ test("HobbyPlannerManager", async t => {
         withPlannerFixture(2092, fixture, activity, () => {
             try {
                 hobby.name = "Updated coding name";
-                const result = plannerManager.get_with_activity(0, 2092);
+                const result = plannerManager.get_with_activity(2092, 0);
 
                 assert.equal(result.activity["0"][0].id, "hobby-coding");
             } finally {
@@ -1627,7 +1636,7 @@ test("HobbyPlannerManager", async t => {
         };
 
         withPlannerFixture(2087, fixture, activity, () => {
-            const result = plannerManager.get_with_activity(1, 2087);
+            const result = plannerManager.get_with_activity(2087, 1);
 
             assert.deepStrictEqual(result.activity["0"].map(entry => entry.sectionid), [1]);
         });
@@ -1644,7 +1653,7 @@ test("HobbyPlannerManager", async t => {
 
         withPlannerFixture(2088, plannerFixture, activityFixture, () => {
             withTemporaryEntry(ACTIVITY_HEATMAP_DATA, 2088, heatmapFixture, () => {
-                const planner = plannerManager.get_with_activity(0, 2088);
+                const planner = plannerManager.get_with_activity(2088, 0);
                 const heatmap = heatmapManager.get(2088, 0, "hobby-coding")["hobby-coding"];
 
                 assert.equal(planner.activity["0"][0].id, "hobby-coding");
@@ -1672,7 +1681,7 @@ test("HobbyPlannerManager", async t => {
         };
 
         withPlannerFixture(2089, fixture, activity, () => {
-            const result = plannerManager.get_with_activity(1, 2089);
+            const result = plannerManager.get_with_activity(2089, 1);
 
             assert.deepStrictEqual(result.activity["0"].map(entry => entry.slot), [0]);
         });
@@ -1688,8 +1697,8 @@ test("HobbyPlannerManager", async t => {
     await t.test("repeated calls return consistent results", () => {
         const year = availableYears[0];
 
-        const first = plannerManager.get(0, year);
-        const second = plannerManager.get(0, year);
+        const first = plannerManager.get(year, 0);
+        const second = plannerManager.get(year, 0);
 
         assert.deepStrictEqual(first, second);
     });

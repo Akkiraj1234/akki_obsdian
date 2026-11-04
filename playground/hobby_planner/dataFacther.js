@@ -1,4 +1,10 @@
-import { FAKE_HOBBIES, HOBBY_PLANNER, ACTIVITY_INFO, ACTIVITY_HEATMAP_DATA } from './fakedata.js';
+import {
+    FAKE_HOBBIES,
+    HOBBY_PLANNER,
+    ACTIVITY_INFO,
+    ACTIVITY_HEATMAP_DATA
+
+} from './fakedata.js';
 
 export const LONG_MONTHS = [
     'January', 'February', 'March', 'April',
@@ -164,6 +170,20 @@ export function getHobbyIdFilterByPlanner(plannerData, activityData = null) {
 export class HobbyManager {
 
     /**
+     * Retrieves the complete collection of hobbies.
+     *
+     * Returns an independent copy of the entire hobby dataset.
+     *
+     * @returns {Object}
+     *          An object containing all hobbies, indexed by their IDs.
+     * 
+     * !! does not returnn in chunk yet need implementation
+     */
+    get_all() {
+        return structuredClone(FAKE_HOBBIES);
+    }
+
+    /**
      * Retrieves an individual hobby by its ID.
      *
      * @param {number|string} hobbyid
@@ -176,20 +196,6 @@ export class HobbyManager {
     get(hobbyid) {
         const result = FAKE_HOBBIES[hobbyid];
         return result ? structuredClone(result) : null;
-    }
-
-    /**
-     * Retrieves the complete collection of hobbies.
-     *
-     * Returns an independent copy of the entire hobby dataset.
-     *
-     * @returns {Object}
-     *          An object containing all hobbies, indexed by their IDs.
-     * 
-     * !! does not returnn in chunk yet need implementation
-     */
-    get_all() {
-        return structuredClone(FAKE_HOBBIES);
     }
 
     /**
@@ -239,14 +245,16 @@ export class ActivityManager {
      * @param {Object} options
      * @param {number[]} [options.onlyhobbyid]
      *        An array of hobby IDs. Only activities belonging
-     *        to the specified hobbies will be included.
+    *        to the specified hobbies will be included. An empty
+    *        array means no hobby filter is applied.
      *
      * @param {Object<number, number[]>} [options.onlysectionid]
      *        An object where each key represents a section ID
      *        and its value is an array of slot IDs.
      *
      *        Only activities matching the specified section IDs
-     *        and their corresponding slots will be included.
+    *        and their corresponding slots will be included. An empty
+    *        object means no section filter is applied.
      */
     #filterItems({ data, onlyhobbyid = [], onlysectionid = {} }) {
         let result = data;
@@ -285,28 +293,41 @@ export class ActivityManager {
      * @param {Object|null} [filterobj=null]
      *        Optional filtering criteria applied to each month's activities.
      *
-     * @param {number[]} [filterobj.onlyhobbyid]
+     * @param {string[]} [filterobj.onlyhobbyid]
      *        Array of hobby IDs to include.
      *
-     * @param {Object<number, number[]>} [filterobj.onlysectionid]
+     * @param {Object<string, number[]>} [filterobj.onlysectionid]
      *        Maps section IDs to arrays of slot IDs to include.
      *
-     * @returns {Object<number, Array>}
+     * @param {Object} [options={}]
+     *        Optional settings controlling the retrieval behaviour.
+     *
+     * @param {boolean} [options.throwOnEmpty=false]
+    *        Whether to throw when the year has no activity data,
+    *        the month range has no activity months, or the filters
+    *        match no activity records. Defaults to false, returning
+    *        an empty object or empty month arrays instead.
+     *
+     * @returns {Object<string, Array>}
      *          Activity data indexed by month, containing only
      *          activities matching the specified filters.
+    *          Empty hobby or section filters do not filter out
+    *          any activity records.
+     *          Returns an empty object if no matching data exists
+     *          and throwOnEmpty is false.
      *
-     * @throws {TypeError}
-     *         If the year or month range contains invalid values.
+     * @throws {RangeError}
+     *         If the month range is invalid.
      *
      * @throws {Error}
      *         If no activity data exists for the requested year
-     *         or month range.
+     *         or month range and throwOnEmpty is true.
      */
-    get_by_month(year, start = 0, end = 11, filterobj = null, error = false) {
+    get_by_month(year, start = 0, end = 11, filterobj = null, { throwOnEmpty = false } = {}) {
         const data = ACTIVITY_INFO[year];
 
         if (!data) {
-            if (!error) return {}
+            if (!throwOnEmpty) return {};
             throw new Error(`No activity data available for year ${year}.`);
         }
 
@@ -336,9 +357,11 @@ export class ActivityManager {
                 ])
         );
 
-        if (Object.keys(result).length === 0) {
-            if (!error) return {}
-            throw new Error("No activity data available for the given month range.");
+        const hasMatchingActivity = Object.values(result).some(activities => activities.length > 0);
+
+        if (Object.keys(result).length === 0 || (filterobj && throwOnEmpty && !hasMatchingActivity)) {
+            if (!throwOnEmpty) return {};
+            throw new Error("No activity data available for the given month range or filters.");
         }
 
         return result;
@@ -347,19 +370,25 @@ export class ActivityManager {
     /**
      * Retrieves activity data for a given year, filtered by hobby IDs.
      *
+     * An empty list means no hobby filter is applied, so all activity
+     * records for the year are returned.
+     *
      * @param {number} year
      *        The year to retrieve activities for.
      *
-     * @param {number[]} hobbyids
-     *        An array of hobby IDs to filter by.
+     * @param {string[]} hobbyids
+     *        Hobby IDs to include. An empty list includes every hobby.
      *
-     * @returns {Object}
-     *        Activity data belonging to the specified hobbies.
+     * @param {Object} [options={}]
+     *        Optional settings, including throwOnEmpty.
+     *
+     * @returns {Object<string, Array>}
+     *          Activity data indexed by month.
      */
-    get_by_hobbyid(year, hobbyids) {
+    get_by_hobbyid(year, hobbyids, options = {}) {
         return this.get_by_month(year, 0, 11, {
             onlyhobbyid: hobbyids
-        });
+        }, options);
     }
 
     /**
@@ -369,16 +398,29 @@ export class ActivityManager {
      * @param {number} year
      *        The year to retrieve activities for.
      *
-     * @param {Object<number, number[]>} sectionids
-     *        An object mapping section IDs to their respective slot IDs.
+     * @param {Object<string, number[]>} sectionids
+    *        An object mapping section IDs to arrays of slot IDs. An
+    *        empty object means no section filter is applied, so all
+    *        activity records are returned.
      *
-     * @returns {Object}
-     *        Activity data matching the specified sections and slots.
+     * @param {Object} [options={}]
+     *        Optional settings controlling the retrieval behaviour.
+     *
+     * @param {boolean} [options.throwOnEmpty=false]
+     *        Whether to throw an error when no matching activity data exists.
+     *
+     * @returns {Object<string, Array>}
+     *          Activity data indexed by month, matching the specified
+     *          sections and slots. Returns an empty object if no matching
+     *          data exists and throwOnEmpty is false.
+     *
+     * @throws {Error}
+     *         If no matching activity data exists and throwOnEmpty is true.
      */
-    get_by_sectionid(year, sectionids) {
+    get_by_sectionid(year, sectionids, options = {}) {
         return this.get_by_month(year, 0, 11, {
             onlysectionid: sectionids
-        });
+        }, options);
     }
 }
 
@@ -730,6 +772,21 @@ export class HobbyPlannerManager {
     }
 
     /**
+     * Retrieves the latest year and month recorded in the hobby planner.
+     *
+     * The month is represented as a zero-based index (0–11).
+     *
+     * @returns {[number, number]}
+     *          A tuple containing the latest year and month index.
+     */
+    latest_year_and_month() {
+        return [
+            HOBBY_PLANNER.latest_year,
+            HOBBY_PLANNER.data[HOBBY_PLANNER.latest_year].latestMonth
+        ];
+    }
+
+    /**
      * Retrieves the planner state for a specific month and year.
      *
      * Resolves the closest available year and month, then retrieves
@@ -754,9 +811,9 @@ export class HobbyPlannerManager {
      * @throws {Error}
      *         If no planner data or available months exist.
      */
-    get(month = null, year = null) {
+    get(year = null, month = null) {
         const target_year = this.#closestYear(year);
-        const target_month = this.#closestmonth(month, target_year);
+        const target_month = this.#closestmonth(target_year, month);
         const year_data = HOBBY_PLANNER.data[target_year];
 
         if (!year_data) {
@@ -794,21 +851,15 @@ export class HobbyPlannerManager {
      * @returns {Object}
      *          Planner data along with associated activity information.
      */
-    get_with_activity(month = null, year = null) {
-        const planner = this.get(month, year);
+    get_with_activity(year = null, month = null) {
+        const planner = this.get(year, month);
 
         if (!planner) {
             throw new Error("Cannot generate data: internal error");
         }
 
-        const onlysectionid = Object.fromEntries(
-            Object.entries(planner.data).map(([sectionid, section]) => [
-                sectionid,
-                Array.from(
-                    { length: section.slotsAllow },
-                    (_, index) => index
-                )
-            ])
+        const onlysectionid = getSectionIdFilterByPlanner(
+            planner.data
         );
 
         const activity = this.hobbyactivity.get_by_month(
@@ -822,13 +873,6 @@ export class HobbyPlannerManager {
             ...planner,
             activity
         };
-    }
-
-    latest_year_and_month() {
-        return (
-            HOBBY_PLANNER.latest_year,
-            HOBBY_PLANNER.data[HOBBY_PLANNER.latest_year].latestMonth
-        );
     }
 
     /**
@@ -894,7 +938,7 @@ export class HobbyPlannerManager {
      * @throws {Error}
      *         If no planner data or available months exist for the year.
      */
-    #closestmonth(month, year) {
+    #closestmonth(year, month) {
         month ??= new Date().getMonth();
         const year_data = HOBBY_PLANNER.data[year];
 
