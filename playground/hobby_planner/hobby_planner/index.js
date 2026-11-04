@@ -4,7 +4,7 @@ import {
 	ActivityManager,
 	ActivityHeatmapManager,
 	HobbyPlannerManager,
-	buildFilterObjectFromPlanner
+	getSectionIdFilterByPlanner
 } from "../dataFacther.js";
 
 const hobbyManager = new HobbyManager();
@@ -153,10 +153,14 @@ class HobbyPlanner {
 	3. hobblyplanneddata: its contian selcted month hobbly planned layout that we are gonna use
 	*/
 	#prepareHobbyData(month, year) {
-		const plannerData = hobbyPlannerManager.get(month, year);
-		const filterobj = buildFilterObjectFromPlanner(plannerData);
-		const currentActivityData = activityManager.get_by_month(year, 0, month, filterobj);
-		const previousActivityData = activityManager.get_by_month(year - 1, month + 1, 11, filterobj);
+		const plannerData = hobbyPlannerManager.get(year, month);
+		const filterobj = getSectionIdFilterByPlanner(plannerData);
+		const currentActivityData = activityManager.get_by_month(
+			year, 0, month, filterobj, { throwOnEmpty: false }
+		);
+		const previousActivityData = activityManager.get_by_month(
+			year - 1, month + 1, 11, filterobj, { throwOnEmpty: false }
+		);
 
 		const currentYearMonths = Array.from(
 			{ length: latestMonth + 1 },
