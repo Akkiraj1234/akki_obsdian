@@ -54,11 +54,11 @@ class HobbyPlanner {
 		this.time = new Date()
 		this.element = element;
 		this.selectedIndex = 0;
-		this.monthdata = [];
+		this.monthData = [];
+		this.plannerData = {};
 
 		this.wheelTimer = null;
 		this.wheelDirection = 0;
-
 	}
 
 	/**
@@ -98,6 +98,17 @@ class HobbyPlanner {
 		this.timelineGrid = this.element.querySelector(".timeline-grid");
 	}
 
+	destroy() {
+		this.element = null;
+		this.selectedIndex = 0;
+		this.monthData = [];
+		this.plannerData = {};
+
+		clearTimeout(this.wheelTimer);
+		window.removeEventListener("resize", this.resizeHandler);
+		this.element.replaceChildren();
+	}
+
 	/**
 	 * Renders the Hobby Planner for the requested month and year.
 	 *
@@ -114,13 +125,23 @@ class HobbyPlanner {
 	 * @throws {RangeError}
 	 *         If the requested month or year is invalid.
 	 */
-	render(month = null, year = null) {
-		month ??= this.time.getMonth();
+	render(year = null, month = null) {
 		year ??= this.time.getFullYear();
+		month ??= this.time.getMonth();
 
-		this.#validateDate(month, year);
-		this.#prepareHobbyData(month, year);
-		this.bindEvents();
+		this.emptyHtmlElements();
+		this.#validateDate(year, month);
+		this.#prepareHobbyData(year, month);
+		this.#renderLeftLable();
+		this.#renderRightMonth();
+		this.#renderRightActivity();
+	}
+
+	emptyHtmlElements() {
+		this.monthRow.replaceChildren();
+		this.labelList.replaceChildren();
+		this.timelineData.replaceChildren(this.timelineGrid);
+		this.timelineGrid.replaceChildren();
 	}
 
 	/**
@@ -135,7 +156,7 @@ class HobbyPlanner {
 	* @throws {RangeError}
 	*         If the month or year is outside the allowed range.
 	*/
-	#validateDate(month, year) {
+	#validateDate(year, month) {
 		if (!Number.isInteger(month) || month < 0 || month > 11) {
 			throw new RangeError("Month must be an integer between 0 and 11.");
 		}
@@ -152,383 +173,50 @@ class HobbyPlanner {
 	2. selcted index: tels about the current selcted index
 	3. hobblyplanneddata: its contian selcted month hobbly planned layout that we are gonna use
 	*/
-	#prepareHobbyData(month, year) {
+	#prepareHobbyData(year, month) {
 		const plannerData = hobbyPlannerManager.get(year, month);
 		const filterobj = getSectionIdFilterByPlanner(plannerData);
-		const currentActivityData = activityManager.get_by_month(
+
+		const currentYearData = activityManager.get_by_month(
 			year, 0, month, filterobj, { throwOnEmpty: false }
 		);
-		const previousActivityData = activityManager.get_by_month(
+
+		const previousYearData = activityManager.get_by_month(
 			year - 1, month + 1, 11, filterobj, { throwOnEmpty: false }
 		);
 
 		const currentYearMonths = Array.from(
-			{ length: latestMonth + 1 },
+			{ length: month + 1 },
 			(_, index) => index
 		).reverse();
 
 		const previousYearMonths = Array.from(
-			{ length: 11 - latestMonth },
+			{ length: 11 - month },
 			(_, index) => 11 - index
 		);
 
-		const monthPositions = [
-			...currentYearMonths.map(month => ({
-				year: latestYear,
-				month
-			})),
-			...previousYearMonths.map(month => ({
-				year: latestYear - 1,
-				month
-			}))
+		const convertToList = (data, months) =>
+			months.map(monthIndex => data[monthIndex] ?? []);
+
+		this.plannerData = plannerData;
+		this.selectedIndex = 0;
+		this.monthData = [
+			convertToList(currentYearData, currentYearMonths),
+			convertToList(previousYearData, previousYearMonths)
 		];
-
-		this.monthdata = monthPositions.map(({ year, month }) => {
-			try {
-				const result = hobbyPlannerManager.get_with_activity(
-					month,
-					year
-				);
-
-				return {
-					year,
-					month,
-					planner: result,
-					available: true
-				};
-			} catch {
-				return {
-					year,
-					month,
-					planner: null,
-					available: false
-				};
-			}
-		});
 	}
-
-	emptyHtmlElements() {
-		this.monthRow.replaceChildren();
-		this.labelList.replaceChildren();
-
-		this.timelineData.replaceChildren(this.timelineGrid);
-		this.timelineGrid.replaceChildren();
-	}
-
-	// ----------------------------------
-	// MAIN RENDER
-	// ----------------------------------
-
-	render() {
-		this.emptyHtmlElements();
-
-		this.renderMonths();
-		this.renderPlanner();
-		this.renderActivityBars();
-		this.updateLayout();
-	}
-
-	// ----------------------------------
-	// MONTH RENDERING
-	// ----------------------------------
-
-	renderMonths() {
-		this.monthRow.replaceChildren();
-		this.timelineGrid.replaceChildren();
-
-		for (const item of this.monthdata) {
-			const month = document.createElement("div");
-
-			month.textContent = SHORT_MONTHS[item.month];
-
-			month.dataset.month =
-				`${item.year}-${String(item.month + 1).padStart(2, "0")}`;
-
-			month.addEventListener("click", () => {
-				const index = this.monthdata.indexOf(item);
-				this.selectMonth(index);
-			});
-
-			this.monthRow.append(month);
-
-			const cell = document.createElement("span");
-			cell.className = "timeline-grid-cell";
-
-			this.timelineGrid.append(cell);
-		}
-	}
-
-	// ----------------------------------
-	// PLANNER RENDERING
-	// ----------------------------------
-
-	renderPlanner() {
-		const selected = this.monthdata[this.selectedIndex];
-
-		if (!selected?.planner) return;
-
-		const data = selected.planner;
-		const plannerData = data.data;
-		const plannerOrder = data.order;
-
-		this.heading.textContent = data.title;
-
-		for (const sectionId of plannerOrder) {
-			const section = plannerData[sectionId];
-
-			if (!section) continue;
-
-			const sectionLabel = document.createElement("div");
-			sectionLabel.className = "label-section-row";
-			sectionLabel.textContent = section.title;
-
-			this.labelList.append(sectionLabel);
-
-			const sectionTimeline = document.createElement("div");
-			sectionTimeline.className = "timeline-section-row";
-
-			this.timelineData.append(sectionTimeline);
-
-			// This assumes your planner manager provides slots
-			// through the same structure as your previous getState().
-			const slots = section.slots ?? [];
-
-			for (const slot of slots) {
-				this.labelList.append(
-					this.addLabel(section, slot)
-				);
-
-				const row = document.createElement("div");
-				row.className = "timeline-activity-row";
-				row.dataset.slotId = slot.id;
-
-				this.timelineData.append(row);
-			}
-		}
-	}
-
-	addLabel(section, slot) {
-		const row = document.createElement("div");
-		row.className = "lable-row depth-1";
-
-		if (!slot.hobby) {
-			row.classList.add("is-empty");
-			row.setAttribute("aria-label", "Empty slot");
-			return row;
-		}
-
-		const dot = document.createElement("span");
-		dot.className = "dot";
-		dot.style.backgroundColor = slot.hobby.color;
-
-		const text = document.createElement("span");
-		text.className = "lable-text";
-
-		const name = document.createElement("p");
-		name.className = "lable-name";
-		name.textContent = slot.hobby.name;
-
-		text.append(name);
-
-		row.title = `${section.title}: ${slot.hobby.description}`;
-		row.append(dot, text);
-
-		return row;
-	}
-
-	// ----------------------------------
-	// ACTIVITY BARS
-	// ----------------------------------
-
-	hobbyClass(id) {
-		return id.replace(/^hobby-/, "");
-	}
-
-	renderActivityBars() {
-		for (const row of this.timelineData.querySelectorAll(
-			".timeline-activity-row"
-		)) {
-			row.replaceChildren();
-
-			let activeStart = null;
-			let activeHobby = null;
-
-			for (
-				let displayIndex = 0;
-				displayIndex <= this.monthdata.length;
-				displayIndex += 1
-			) {
-				const state =
-					displayIndex < this.monthdata.length
-						? this.monthdata[displayIndex].planner
-						: null;
-
-				const sections = state
-					? state.sections ?? []
-					: [];
-
-				const slot = sections
-					.flatMap(section => section.slots)
-					.find(entry => entry.id === row.dataset.slotId);
-
-				const hobby = slot?.hobby ?? null;
-
-				const hobbyChanged =
-					hobby?.id !== activeHobby?.id;
-
-				if (activeHobby && (!hobby || hobbyChanged)) {
-					const bar = document.createElement("div");
-
-					bar.className =
-						`activity-bar ${this.hobbyClass(activeHobby.id)}`;
-
-					bar.style.gridColumn =
-						`${activeStart + 1} / ${displayIndex + 1}`;
-
-					bar.style.backgroundColor = activeHobby.color;
-					bar.title = activeHobby.name;
-
-					row.append(bar);
-					activeStart = null;
-				}
-
-				if (hobby && (!activeHobby || hobbyChanged)) {
-					activeStart = displayIndex;
-				}
-
-				activeHobby = hobby;
-			}
-		}
-	}
-
-	// ----------------------------------
-	// LAYOUT
-	// ----------------------------------
-
-	updateLayout() {
-		const selectedWidth = Math.max(
-			MONTH_WIDTH,
-			Math.floor(this.timeline.clientWidth / 2)
-		);
-
-		const columns = this.monthdata
-			.map((_, index) =>
-				`${index === this.selectedIndex
-					? selectedWidth
-					: MONTH_WIDTH}px`
-			)
-			.join(" ");
-
-		const contentWidth =
-			this.monthdata.length * MONTH_WIDTH +
-			selectedWidth - MONTH_WIDTH;
-
-		const tailWidth = Math.max(
-			0,
-			this.timeline.clientWidth - selectedWidth
-		);
-
-		this.track.style.setProperty(
-			"--content-width",
-			`${contentWidth}px`
-		);
-
-		this.track.style.setProperty(
-			"--tail-width",
-			`${tailWidth}px`
-		);
-
-		this.monthRow.style.gridTemplateColumns = columns;
-		this.monthRow.style.width = `${contentWidth}px`;
-
-		this.timelineGrid.style.gridTemplateColumns = columns;
-		this.timelineData.style.width = `${contentWidth}px`;
-
-		this.timelineData
-			.querySelectorAll(".timeline-activity-row")
-			.forEach(row => {
-				row.style.gridTemplateColumns = columns;
-				row.style.width = `${contentWidth}px`;
-			});
-
-		[...this.monthRow.children].forEach((month, index) => {
-			month.classList.toggle(
-				"selected",
-				index === this.selectedIndex
-			);
-		});
-
-		[...this.timelineGrid.children].forEach((cell, index) => {
-			cell.classList.toggle(
-				"selected",
-				index === this.selectedIndex
-			);
-		});
-	}
-
-	// ----------------------------------
-	// NAVIGATION
-	// ----------------------------------
-
-	selectMonth(index, behavior = "smooth") {
-		this.selectedIndex = Math.max(
-			0,
-			Math.min(this.monthdata.length - 1, index)
-		);
-
-		this.renderPlanner();
-		this.renderActivityBars();
-		this.updateLayout();
-
-		this.timeline.scrollTo({
-			left: this.selectedIndex * MONTH_WIDTH,
-			behavior
-		});
-	}
-
-	bindEvents() {
-		this.timeline.addEventListener(
-			"wheel",
-			event => {
-				const delta =
-					Math.abs(event.deltaX) > Math.abs(event.deltaY)
-						? event.deltaX
-						: event.deltaY;
-
-				if (!delta) return;
-
-				event.preventDefault();
-
-				this.wheelDirection = delta > 0 ? 1 : -1;
-
-				clearTimeout(this.wheelTimer);
-
-				this.wheelTimer = window.setTimeout(() => {
-					this.selectMonth(
-						this.selectedIndex + this.wheelDirection
-					);
-				}, 80);
-			},
-			{ passive: false }
-		);
-
-		this.resizeHandler = () => {
-			this.updateLayout();
-
-			this.timeline.scrollTo({
-				left: this.selectedIndex * MONTH_WIDTH,
-				behavior: "auto"
-			});
-		};
-
-		window.addEventListener("resize", this.resizeHandler);
-	}
-
-	destroy() {
-		clearTimeout(this.wheelTimer);
-		window.removeEventListener("resize", this.resizeHandler);
-		this.element.replaceChildren();
-	}
+	#renderLeftLable() { }
+	#renderRightMonth() { }
+	#renderRightActivity() { }
 }
 
-const planner = new HobbyPlanner(document.querySelector(".mainbody"));
+
+// main body runner
+
+function main() {
+	const mainbody = document.querySelector(".mainbody");
+	const planner = new HobbyPlanner(mainbody);
+	planner.initialize();
+	planner.render();
+}
+main();

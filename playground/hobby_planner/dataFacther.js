@@ -87,8 +87,12 @@ function validatecolor(colors) {
  *          Section IDs mapped to their allowed slot IDs.
  */
 export function getSectionIdFilterByPlanner(plannerData) {
+    if (!plannerData?.data || typeof plannerData.data !== "object" || Array.isArray(plannerData.data)) {
+        throw new TypeError("Expected a planner object containing section data.");
+    }
+
     return Object.fromEntries(
-        Object.entries(plannerData).map(([sectionId, section]) => [
+        Object.entries(plannerData.data).map(([sectionId, section]) => [
             sectionId,
             Array.from(
                 { length: section.slotsAllow },
@@ -1141,7 +1145,3 @@ export class HobbyPlannerManager {
         };
     }
 }
-
-
-const daa = new HobbyPlannerManager();
-console.log(daa.get());
