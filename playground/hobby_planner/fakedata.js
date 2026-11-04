@@ -379,6 +379,95 @@ export const ACTIVITY_INFO = {
 			{ id: "hobby-guitar", sectionid: 4, slot: 0, start: null, end: null },
 			{ id: "hobby-workout", sectionid: 3, slot: 0, start: null, end: null },
 		]
+	},
+	2025: {
+		0: [
+			{ id: "hobby-coding", sectionid: 1, slot: 0, start: null, end: null },
+			{ id: "hobby-leetcode", sectionid: 1, slot: 1, start: null, end: null },
+			{ id: "hobby-sketching", sectionid: 2, slot: 0, start: null, end: null },
+			{ id: "hobby-guitar", sectionid: 2, slot: 1, start: null, end: null },
+			{ id: "hobby-workout", sectionid: 3, slot: 0, start: null, end: null },
+		],
+		1: [
+			{ id: "hobby-coding", sectionid: 1, slot: 0, start: null, end: null },
+			{ id: "hobby-leetcode", sectionid: 1, slot: 1, start: null, end: null },
+			{ id: "hobby-sketching", sectionid: 2, slot: 0, start: null, end: null },
+			{ id: "hobby-guitar", sectionid: 2, slot: 1, start: null, end: null },
+			{ id: "hobby-workout", sectionid: 3, slot: 0, start: null, end: null },
+		],
+		2: [
+			{ id: "hobby-coding", sectionid: 1, slot: 0, start: null, end: null },
+			{ id: "hobby-leetcode", sectionid: 1, slot: 1, start: null, end: null },
+			{ id: "hobby-sketching", sectionid: 2, slot: 0, start: null, end: null },
+			{ id: "hobby-chess", sectionid: 2, slot: 1, start: null, end: null },
+			{ id: "hobby-workout", sectionid: 3, slot: 0, start: null, end: null },
+		],
+		3: [
+			{ id: "hobby-coding", sectionid: 1, slot: 0, start: null, end: null },
+			{ id: "hobby-leetcode", sectionid: 1, slot: 1, start: null, end: null },
+			{ id: "hobby-sketching", sectionid: 2, slot: 0, start: null, end: null },
+			{ id: "hobby-workout", sectionid: 3, slot: 0, start: null, end: null },
+		],
+		4: [
+			{ id: "hobby-coding", sectionid: 1, slot: 0, start: null, end: null },
+			{ id: "hobby-leetcode", sectionid: 1, slot: 1, start: null, end: null },
+			{ id: "hobby-sketching", sectionid: 2, slot: 0, start: null, end: null },
+			{ id: "hobby-guitar", sectionid: 2, slot: 1, start: null, end: null },
+			{ id: "hobby-workout", sectionid: 3, slot: 0, start: null, end: null },
+		],
+		5: [
+			{ id: "hobby-coding", sectionid: 1, slot: 0, start: null, end: null },
+			{ id: "hobby-leetcode", sectionid: 1, slot: 1, start: null, end: null },
+			{ id: "hobby-sketching", sectionid: 2, slot: 0, start: null, end: null },
+			{ id: "hobby-guitar", sectionid: 2, slot: 1, start: null, end: null },
+			{ id: "hobby-workout", sectionid: 3, slot: 0, start: null, end: null },
+		],
+		6: [
+			{ id: "hobby-coding", sectionid: 1, slot: 0, start: null, end: null },
+			{ id: "hobby-leetcode", sectionid: 1, slot: 1, start: null, end: null },
+			{ id: "hobby-sketching", sectionid: 2, slot: 0, start: null, end: null },
+			{ id: "hobby-guitar", sectionid: 2, slot: 1, start: null, end: null },
+			{ id: "hobby-workout", sectionid: 3, slot: 0, start: null, end: null },
+		],
+		7: [
+			{ id: "hobby-coding", sectionid: 1, slot: 0, start: null, end: null },
+			{ id: "hobby-sketching", sectionid: 2, slot: 0, start: null, end: null },
+			{ id: "hobby-chess", sectionid: 2, slot: 1, start: null, end: null },
+			{ id: "hobby-guitar", sectionid: 4, slot: 0, start: null, end: null },
+			{ id: "hobby-workout", sectionid: 3, slot: 0, start: null, end: null },
+		],
+		8: [
+			{ id: "hobby-coding", sectionid: 1, slot: 0, start: null, end: null },
+			{ id: "hobby-leetcode", sectionid: 1, slot: 1, start: null, end: null },
+			{ id: "hobby-reading", sectionid: 5, slot: 0, start: null, end: null },
+			{ id: "hobby-chess", sectionid: 2, slot: 1, start: null, end: null },
+			{ id: "hobby-guitar", sectionid: 4, slot: 0, start: null, end: null },
+			{ id: "hobby-workout", sectionid: 3, slot: 0, start: null, end: null },
+		],
+		9: [
+			{ id: "hobby-coding", sectionid: 1, slot: 0, start: null, end: null },
+			{ id: "hobby-leetcode", sectionid: 1, slot: 1, start: null, end: null },
+			{ id: "hobby-reading", sectionid: 5, slot: 0, start: null, end: null },
+			{ id: "hobby-chess", sectionid: 2, slot: 1, start: null, end: null },
+			{ id: "hobby-guitar", sectionid: 4, slot: 0, start: null, end: null },
+			{ id: "hobby-workout", sectionid: 3, slot: 0, start: null, end: null },
+		],
+		10: [
+			{ id: "hobby-coding", sectionid: 1, slot: 0, start: null, end: null },
+			{ id: "hobby-leetcode", sectionid: 1, slot: 1, start: null, end: null },
+			{ id: "hobby-reading", sectionid: 5, slot: 0, start: null, end: null },
+			{ id: "hobby-chess", sectionid: 2, slot: 1, start: null, end: null },
+			{ id: "hobby-guitar", sectionid: 4, slot: 0, start: null, end: null },
+			{ id: "hobby-workout", sectionid: 3, slot: 0, start: null, end: null },
+		],
+		11: [
+			{ id: "hobby-coding", sectionid: 1, slot: 0, start: null, end: null },
+			{ id: "hobby-leetcode", sectionid: 1, slot: 1, start: null, end: null },
+			{ id: "hobby-reading", sectionid: 5, slot: 0, start: null, end: null },
+			{ id: "hobby-chess", sectionid: 2, slot: 1, start: null, end: null },
+			{ id: "hobby-guitar", sectionid: 4, slot: 0, start: null, end: null },
+			{ id: "hobby-workout", sectionid: 3, slot: 0, start: null, end: null },
+		]
 	}
 }
 
@@ -394,6 +483,332 @@ export const ACTIVITY_INFO = {
  */
 export const ACTIVITY_HEATMAP_DATA = {
 	2026: {
+		0: {
+			"hobby-coding": {
+				values: [1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1],
+				targetHistory: [{ from: 1, target: 1 }]
+			},
+			"hobby-leetcode": {
+				values: [2, 0, 3, 1, 5, 0, 2, 4, 0, 3, 2, 1, 0, 4, 6, 2, 0, 3, 1, 5, 0, 2, 4, 1, 0, 3, 2, 0, 5, 1, 3],
+				targetHistory: [{ from: 1, target: 2 }]
+			},
+			"hobby-sketching": {
+				values: [30, 45, 0, 60, 20, 0, 40, 75, 30, 0, 50, 60, 0, 25, 45, 90, 0, 30, 60, 20, 0, 45, 75, 30, 0, 60, 40, 0, 25, 50, 60],
+				targetHistory: [{ from: 1, target: 120 }]
+			},
+			"hobby-guitar": {
+				values: [20, 30, 0, 45, 60, 0, 30, 15, 40, 0, 60, 30, 20, 0, 45, 75, 0, 30, 60, 15, 0, 45, 30, 60, 0, 20, 45, 0, 30, 60, 40],
+				targetHistory: [{ from: 1, target: 60 }]
+			},
+			"hobby-workout": {
+				values: [30, 0, 45, 30, 0, 60, 45, 0, 30, 60, 0, 45, 30, 0, 60, 45, 30, 0, 45, 60, 0, 30, 45, 0, 60, 30, 0, 45, 60, 30, 0],
+				targetHistory: [{ from: 1, target: 30 }]
+			}
+		},
+
+		1: { // February
+			"hobby-coding": {
+				values: [1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0],
+				targetHistory: [{ from: 1, target: 1 }]
+			},
+			"hobby-leetcode": {
+				values: [3, 1, 0, 4, 2, 5, 0, 3, 1, 6, 2, 0, 4, 3, 1, 0, 5, 2, 4, 0, 3, 1, 5, 2, 0, 4, 1, 3],
+				targetHistory: [{ from: 1, target: 2 }]
+			},
+			"hobby-sketching": {
+				values: [45, 0, 30, 60, 20, 45, 0, 75, 30, 0, 60, 40, 25, 0, 50, 30, 60, 0, 45, 20, 0, 75, 30, 45, 0, 60, 25, 40],
+				targetHistory: [{ from: 1, target: 120 }]
+			},
+			"hobby-guitar": {
+				values: [30, 0, 45, 20, 60, 0, 30, 45, 0, 60, 15, 30, 0, 45, 60, 0, 20, 40, 0, 30, 60, 45, 0, 30, 15, 0, 45, 60],
+				targetHistory: [{ from: 1, target: 60 }]
+			},
+			"hobby-workout": {
+				values: [45, 0, 30, 60, 0, 45, 30, 0, 60, 45, 0, 30, 45, 60, 0, 30, 45, 0, 60, 30, 45, 0, 30, 60, 0, 45, 30, 60],
+				targetHistory: [{ from: 1, target: 30 }]
+			}
+		},
+
+		2: { // March
+			"hobby-coding": {
+				values: [1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1],
+				targetHistory: [{ from: 1, target: 1 }]
+			},
+			"hobby-leetcode": {
+				values: [4, 2, 0, 3, 5, 1, 0, 6, 2, 4, 0, 3, 1, 5, 2, 0, 4, 6, 1, 3, 0, 5, 2, 4, 1, 0, 3, 6, 2, 4, 0],
+				targetHistory: [
+					{ from: 1, target: 2 },
+					{ from: 15, target: 3 }
+				]
+			},
+			"hobby-sketching": {
+				values: [30, 60, 0, 45, 75, 20, 0, 40, 60, 30, 0, 90, 45, 0, 25, 60, 30, 45, 0, 75, 20, 0, 60, 40, 30, 0, 45, 90, 0, 60, 30],
+				targetHistory: [{ from: 1, target: 120 }]
+			},
+			"hobby-chess": {
+				values: [0, 20, 30, 0, 45, 15, 0, 30, 60, 0, 20, 45, 0, 30, 15, 60, 0, 25, 40, 0, 30, 45, 0, 20, 60, 0, 30, 15, 45, 0, 30],
+				targetHistory: [{ from: 1, target: 30 }]
+			},
+			"hobby-workout": {
+				values: [30, 45, 0, 60, 30, 0, 45, 60, 0, 30, 45, 0, 60, 30, 45, 0, 30, 60, 0, 45, 30, 0, 60, 45, 30, 0, 45, 60, 0, 30, 45],
+				targetHistory: [{ from: 1, target: 30 }]
+			}
+		},
+
+		3: { // April
+			"hobby-coding": {
+				values: [1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1],
+				targetHistory: [{ from: 1, target: 1 }]
+			},
+			"hobby-leetcode": {
+				values: [2, 4, 0, 3, 1, 5, 2, 0, 4, 3, 1, 0, 5, 2, 4, 0, 3, 1, 6, 0, 2, 4, 3, 0, 5, 1, 2, 0, 4, 3],
+				targetHistory: [{ from: 1, target: 2 }]
+			},
+			"hobby-sketching": {
+				values: [45, 0, 30, 60, 0, 25, 45, 0, 75, 30, 60, 0, 40, 20, 0, 60, 45, 30, 0, 75, 25, 0, 45, 60, 30, 0, 50, 40, 0, 60],
+				targetHistory: [
+					{ from: 1, target: 120 },
+					{ from: 10, target: 150 }
+				]
+			},
+			"hobby-workout": {
+				values: [30, 45, 0, 60, 0, 30, 45, 60, 0, 30, 45, 0, 60, 30, 0, 45, 60, 30, 0, 45, 30, 60, 0, 45, 30, 0, 60, 45, 30, 0],
+				targetHistory: [{ from: 1, target: 30 }]
+			}
+		},
+
+		4: { // May
+			"hobby-coding": {
+				values: [1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1],
+				targetHistory: [{ from: 1, target: 1 }]
+			},
+			"hobby-leetcode": {
+				values: [3, 0, 4, 2, 1, 5, 0, 3, 2, 6, 0, 4, 1, 3, 0, 5, 2, 4, 0, 3, 1, 6, 2, 0, 4, 3, 0, 5, 1, 2, 4],
+				targetHistory: [{ from: 1, target: 2 }]
+			},
+			"hobby-sketching": {
+				values: [30, 45, 0, 60, 20, 0, 75, 30, 45, 0, 60, 25, 0, 40, 60, 30, 0, 45, 75, 0, 20, 60, 30, 0, 45, 50, 0, 30, 60, 25, 45],
+				targetHistory: [
+					{ from: 1, target: 150 }
+				]
+			},
+			"hobby-guitar": {
+				values: [20, 0, 30, 45, 60, 0, 15, 30, 0, 45, 60, 20, 0, 30, 45, 0, 60, 30, 15, 0, 45, 60, 30, 0, 20, 45, 0, 60, 30, 15, 45],
+				targetHistory: [{ from: 1, target: 60 }]
+			},
+			"hobby-workout": {
+				values: [45, 0, 30, 60, 45, 0, 30, 45, 60, 0, 30, 45, 0, 60, 30, 45, 0, 30, 60, 45, 0, 30, 45, 60, 0, 30, 45, 0, 60, 30, 45],
+				targetHistory: [{ from: 1, target: 30 }]
+			}
+		},
+
+		5: { // June
+			"hobby-coding": {
+				values: [1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1],
+				targetHistory: [{ from: 1, target: 1 }]
+			},
+			"hobby-leetcode": {
+				values: [2, 3, 0, 5, 1, 4, 0, 2, 6, 3, 0, 4, 1, 5, 0, 3, 2, 4, 0, 6, 1, 3, 0, 5, 2, 4, 0, 1, 3, 5],
+				targetHistory: [{ from: 1, target: 2 }]
+			},
+			"hobby-sketching": {
+				values: [45, 0, 30, 60, 25, 0, 45, 75, 30, 0, 60, 40, 0, 20, 50, 30, 0, 45, 60, 0, 25, 75, 30, 45, 0, 60, 40, 0, 30, 50],
+				targetHistory: [{ from: 1, target: 150 }]
+			},
+			"hobby-guitar": {
+				values: [30, 45, 0, 20, 60, 0, 30, 45, 15, 0, 60, 30, 0, 45, 20, 60, 0, 30, 45, 0, 15, 60, 30, 0, 45, 20, 0, 60, 30, 45],
+				targetHistory: [{ from: 1, target: 60 }]
+			},
+			"hobby-workout": {
+				values: [30, 0, 45, 60, 0, 30, 45, 0, 60, 30, 45, 0, 30, 60, 0, 45, 30, 0, 60, 45, 30, 0, 45, 60, 0, 30, 45, 0, 60, 30],
+				targetHistory: [
+					{ from: 1, target: 30 },
+					{ from: 15, target: 45 }
+				]
+			}
+		},
+
+		6: { // July
+			"hobby-coding": {
+				values: [1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1],
+				targetHistory: [{ from: 1, target: 1 }]
+			},
+			"hobby-leetcode": {
+				values: [4, 2, 0, 5, 3, 1, 0, 4, 6, 2, 0, 3, 5, 1, 0, 4, 2, 6, 0, 3, 1, 5, 0, 4, 2, 3, 0, 6, 1, 4, 2],
+				targetHistory: [
+					{ from: 1, target: 3 }
+				]
+			},
+			"hobby-sketching": {
+				values: [30, 60, 0, 45, 20, 75, 0, 30, 60, 0, 45, 25, 0, 50, 30, 60, 0, 45, 75, 0, 20, 60, 30, 0, 45, 50, 0, 30, 60, 25, 45],
+				targetHistory: [{ from: 1, target: 150 }]
+			},
+			"hobby-guitar": {
+				values: [20, 45, 0, 30, 60, 0, 15, 45, 30, 0, 60, 20, 0, 45, 30, 60, 0, 15, 45, 0, 30, 60, 20, 0, 45, 30, 0, 60, 15, 45, 30],
+				targetHistory: [
+					{ from: 1, target: 60 },
+					{ from: 12, target: 90 }
+				]
+			},
+			"hobby-workout": {
+				values: [45, 0, 30, 60, 0, 45, 30, 0, 60, 45, 0, 30, 60, 45, 0, 30, 45, 0, 60, 30, 45, 0, 30, 60, 0, 45, 30, 60, 0, 45, 30],
+				targetHistory: [{ from: 1, target: 45 }]
+			}
+		},
+
+		7: { // August
+			"hobby-coding": {
+				values: [1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1],
+				targetHistory: [{ from: 1, target: 1 }]
+			},
+			"hobby-sketching": {
+				values: [30, 0, 45, 60, 20, 0, 75, 30, 0, 45, 60, 25, 0, 40, 60, 30, 0, 45, 75, 0, 20, 60, 30, 0, 45, 50, 0, 30, 60, 25, 45],
+				targetHistory: [
+					{ from: 1, target: 150 },
+					{ from: 18, target: 90 }
+				]
+			},
+			"hobby-chess": {
+				values: [0, 30, 45, 0, 20, 60, 15, 0, 30, 45, 0, 20, 60, 0, 30, 15, 45, 0, 60, 20, 0, 30, 45, 0, 15, 60, 30, 0, 45, 20, 0],
+				targetHistory: [{ from: 1, target: 30 }]
+			},
+			"hobby-guitar": {
+				values: [30, 0, 45, 20, 60, 0, 30, 15, 45, 0, 60, 30, 20, 0, 45, 60, 0, 30, 15, 45, 0, 60, 20, 0, 30, 45, 0, 60, 15, 30, 45],
+				targetHistory: [{ from: 1, target: 90 }]
+			},
+			"hobby-workout": {
+				values: [30, 45, 0, 60, 30, 0, 45, 60, 0, 30, 45, 0, 60, 30, 45, 0, 30, 60, 0, 45, 30, 0, 60, 45, 30, 0, 45, 60, 0, 30, 45],
+				targetHistory: [{ from: 1, target: 45 }]
+			}
+		},
+
+		8: { // September
+			"hobby-coding": {
+				values: [1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1],
+				targetHistory: [{ from: 1, target: 1 }]
+			},
+			"hobby-leetcode": {
+				values: [3, 0, 4, 2, 5, 1, 0, 3, 6, 2, 0, 4, 1, 5, 0, 3, 2, 4, 0, 6, 1, 3, 0, 5, 2, 4, 0, 1, 3, 5],
+				targetHistory: [{ from: 1, target: 3 }]
+			},
+			"hobby-reading": {
+				values: [10, 20, 0, 15, 30, 0, 25, 10, 0, 20, 15, 30, 0, 10, 25, 20, 0, 15, 30, 10, 0, 20, 15, 25, 0, 10, 30, 20, 0, 15],
+				targetHistory: [{ from: 1, target: 10 }]
+			},
+			"hobby-chess": {
+				values: [0, 20, 30, 0, 45, 15, 0, 30, 60, 0, 20, 45, 0, 30, 15, 60, 0, 25, 40, 0, 30, 45, 0, 20, 60, 0, 30, 15, 45, 0],
+				targetHistory: [
+					{ from: 1, target: 30 },
+					{ from: 16, target: 45 }
+				]
+			},
+			"hobby-guitar": {
+				values: [20, 45, 0, 30, 60, 0, 15, 45, 30, 0, 60, 20, 0, 45, 30, 60, 0, 15, 45, 0, 30, 60, 20, 0, 45, 30, 0, 60, 15, 45],
+				targetHistory: [{ from: 1, target: 90 }]
+			},
+			"hobby-workout": {
+				values: [45, 0, 30, 60, 0, 45, 30, 0, 60, 45, 0, 30, 60, 45, 0, 30, 45, 0, 60, 30, 45, 0, 30, 60, 0, 45, 30, 60, 0, 45],
+				targetHistory: [{ from: 1, target: 45 }]
+			}
+		},
+
+		9: { // October
+			"hobby-coding": {
+				values: [0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1],
+				targetHistory: [{ from: 1, target: 1 }]
+			},
+			"hobby-leetcode": {
+				values: [4, 2, 0, 5, 3, 1, 0, 4, 6, 2, 0, 3, 5, 1, 0, 4, 2, 6, 0, 3, 1, 5, 0, 4, 2, 3, 0, 6, 1, 4, 2],
+				targetHistory: [{ from: 1, target: 3 }]
+			},
+			"hobby-reading": {
+				values: [10, 20, 0, 15, 30, 0, 25, 10, 0, 20, 15, 30, 0, 10, 25, 20, 0, 15, 30, 10, 0, 20, 15, 25, 0, 10, 30, 20, 0, 15, 25],
+				targetHistory: [
+					{ from: 1, target: 10 },
+					{ from: 12, target: 15 }
+				]
+			},
+			"hobby-chess": {
+				values: [0, 30, 45, 0, 20, 60, 15, 0, 30, 45, 0, 20, 60, 0, 30, 15, 45, 0, 60, 20, 0, 30, 45, 0, 15, 60, 30, 0, 45, 20, 0],
+				targetHistory: [{ from: 1, target: 45 }]
+			},
+			"hobby-guitar": {
+				values: [30, 0, 45, 20, 60, 0, 30, 15, 45, 0, 60, 30, 20, 0, 45, 60, 0, 30, 15, 45, 0, 60, 20, 0, 30, 45, 0, 60, 15, 30, 45],
+				targetHistory: [{ from: 1, target: 90 }]
+			},
+			"hobby-workout": {
+				values: [30, 45, 0, 60, 30, 0, 45, 60, 0, 30, 45, 0, 60, 30, 45, 0, 30, 60, 0, 45, 30, 0, 60, 45, 30, 0, 45, 60, 0, 30, 45],
+				targetHistory: [
+					{ from: 1, target: 45 },
+					{ from: 22, target: 60 }
+				]
+			}
+		},
+
+		10: { // November
+			"hobby-coding": {
+				values: [1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1],
+				targetHistory: [{ from: 1, target: 1 }]
+			},
+			"hobby-leetcode": {
+				values: [3, 0, 4, 2, 1, 5, 0, 3, 2, 6, 0, 4, 1, 3, 0, 5, 2, 4, 0, 3, 1, 6, 2, 0, 4, 3, 0, 5, 1, 2],
+				targetHistory: [{ from: 1, target: 3 }]
+			},
+			"hobby-reading": {
+				values: [10, 0, 20, 15, 30, 0, 25, 10, 20, 0, 15, 30, 10, 0, 25, 20, 15, 0, 30, 10, 20, 0, 15, 25, 30, 0, 10, 20, 15, 0],
+				targetHistory: [{ from: 1, target: 15 }]
+			},
+			"hobby-chess": {
+				values: [0, 20, 30, 45, 0, 15, 60, 0, 30, 20, 0, 45, 30, 0, 15, 60, 20, 0, 45, 30, 0, 60, 15, 30, 0, 20, 45, 0, 30, 60],
+				targetHistory: [{ from: 1, target: 45 }]
+			},
+			"hobby-guitar": {
+				values: [20, 45, 0, 30, 60, 0, 15, 45, 30, 0, 60, 20, 0, 45, 30, 60, 0, 15, 45, 0, 30, 60, 20, 0, 45, 30, 0, 60, 15, 45],
+				targetHistory: [
+					{ from: 1, target: 90 },
+					{ from: 16, target: 45 }
+				]
+			},
+			"hobby-workout": {
+				values: [45, 0, 30, 60, 0, 45, 30, 0, 60, 45, 0, 30, 60, 45, 0, 30, 45, 0, 60, 30, 45, 0, 30, 60, 0, 45, 30, 60, 0, 45],
+				targetHistory: [{ from: 1, target: 60 }]
+			}
+		},
+
+		11: { // December
+			"hobby-coding": {
+				values: [1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1],
+				targetHistory: [{ from: 1, target: 1 }]
+			},
+			"hobby-leetcode": {
+				values: [2, 3, 0, 5, 1, 4, 0, 2, 6, 3, 0, 4, 1, 5, 0, 3, 2, 4, 0, 6, 1, 3, 0, 5, 2, 4, 0, 1, 3, 5, 2],
+				targetHistory: [{ from: 1, target: 3 }]
+			},
+			"hobby-reading": {
+				values: [10, 20, 0, 15, 30, 0, 25, 10, 0, 20, 15, 30, 0, 10, 25, 20, 0, 15, 30, 10, 0, 20, 15, 25, 0, 10, 30, 20, 0, 15, 25],
+				targetHistory: [
+					{ from: 1, target: 15 },
+					{ from: 20, target: 12 }
+				]
+			},
+			"hobby-chess": {
+				values: [0, 30, 45, 0, 20, 60, 15, 0, 30, 45, 0, 20, 60, 0, 30, 15, 45, 0, 60, 20, 0, 30, 45, 0, 15, 60, 30, 0, 45, 20, 0],
+				targetHistory: [
+					{ from: 1, target: 45 },
+					{ from: 10, target: 60 }
+				]
+			},
+			"hobby-guitar": {
+				values: [30, 0, 45, 20, 60, 0, 30, 15, 45, 0, 60, 30, 20, 0, 45, 60, 0, 30, 15, 45, 0, 60, 20, 0, 30, 45, 0, 60, 15, 30, 45],
+				targetHistory: [{ from: 1, target: 45 }]
+			},
+			"hobby-workout": {
+				values: [30, 45, 0, 60, 30, 0, 45, 60, 0, 30, 45, 0, 60, 30, 45, 0, 30, 60, 0, 45, 30, 0, 60, 45, 30, 0, 45, 60, 0, 30, 45],
+				targetHistory: [{ from: 1, target: 60 }]
+			}
+		}
+	},
+	2025: {
 		0: {
 			"hobby-coding": {
 				values: [1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1],
