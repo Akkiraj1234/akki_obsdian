@@ -638,14 +638,14 @@ export class HobbyPlanner {
 	}
 
 	/**
- * Selects a month in the timeline.
- *
- * Updates the selected month index and refreshes the labels and activity
- * rows to reflect the selected month's planner assignments.
- *
- * @param {number} index
- *        Index of the month in the timeline.
- */
+	 * Selects a month in the timeline.
+	 *
+	 * Updates the selected month index and refreshes the labels and activity
+	 * rows to reflect the selected month's planner assignments.
+	 *
+	 * @param {number} index
+	 *        Index of the month in the timeline.
+	 */
 	#selectMonth(index) {
 		const months = this.#getTimelineMonths();
 
