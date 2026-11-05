@@ -23,3 +23,6 @@ data.json
 
 #ignore all build
 build/
+
+#ignore one-plugin workflow file
+/workflow.json

@@ -14,10 +14,9 @@
 		"forceConsistentCasingInFileNames": true,
 		"allowSyntheticDefaultImports": true,
 		"lib": ["ES2021", "DOM"],
-		"baseUrl": "./",
 		"paths": {
-			"@/*": ["src/*"],
+			"@/*": ["./src/*"]
 		}
 	},
-	"include": ["src/**/*.ts", "src1/main.ts"],
+	"include": ["src/**/*.ts", "src1/main.ts"]
 }
