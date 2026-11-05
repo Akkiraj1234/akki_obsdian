@@ -1,0 +1,12 @@
+:host {
+	display: block;
+	min-width: 0;
+	color: var(--text);
+	font: inherit;
+}
+
+:host *,
+:host *::before,
+:host *::after {
+	box-sizing: border-box;
+}

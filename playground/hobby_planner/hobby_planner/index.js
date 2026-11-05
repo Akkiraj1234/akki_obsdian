@@ -29,7 +29,7 @@ const MONTH_WIDTH = 100;
  *
  * @class HobbyPlanner
  */
-class HobbyPlanner {
+export class HobbyPlanner {
 
 	/**
 	 * Creates a HobbyPlanner instance.
@@ -857,19 +857,28 @@ class HobbyPlanner {
 }
 
 
-// Main body runner
+class HobbyPlannerElement extends HTMLElement {
+	connectedCallback() {
+		if (this.shadowRoot) return;
 
-function main() {
-	const mainbody = document.querySelector(".mainbody");
+		const shadow = this.attachShadow({ mode: "open" });
+		const stylesheet = document.createElement("link");
+		stylesheet.rel = "stylesheet";
+		stylesheet.href = new URL("./index.css", import.meta.url).href;
 
-	if (!mainbody) {
-		throw new Error("HobbyPlanner container '.mainbody' was not found.");
+		const container = document.createElement("div");
+		container.className = "planner-root";
+		shadow.append(stylesheet, container);
+
+		this.planner = new HobbyPlanner(container);
+		this.planner.initialize();
+		this.planner.render();
 	}
 
-	const planner = new HobbyPlanner(mainbody);
-
-	planner.initialize();
-	planner.render();
+	disconnectedCallback() {
+		this.planner?.destroy();
+		this.planner = null;
+	}
 }
 
-main();
+customElements.define("hobby-planner", HobbyPlannerElement);
