@@ -1,9 +1,7 @@
 - [ ] create builder script and test script and other configuration
-- [ ] adr not yet
-- [ ] how app works yeah but not yet
-- [ ] how to devlope not yet
-
-- [ ] build redeme.md
+- [x] write good markdown
+- [x] build redeme.md
+- [x] write contributers.md
 - [ ] build ui interface for hobby manager
 - [ ] check for markdb script and status
 - [ ] setup whole project structure

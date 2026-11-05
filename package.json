@@ -1,10 +1,11 @@
 {
-	"name": "akki-obsidian",
+	"name": "oneplugin-obsidian",
 	"version": "0.1.3",
-	"description": "this is a personal plugin for managing my tasks in obsidian",
+	"description": "An all-in-one Obsidian plugin to help users organise their lives.",
 	"main": "main.js",
 	"type": "module",
 	"scripts": {
+		"build-test": "node build-test.mjs",
 		"test": "node --import jiti/register src/core/markdb/test/errors.test.ts && node --import jiti/register src/core/markdb/test/core.test.ts && node --import jiti/register src/core/markdb/test/backends.test.ts",
 		"dev": "node esbuild.config.mjs",
 		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
@@ -12,8 +13,14 @@
 		"lint": "eslint .",
 		"release": "node release.mjs"
 	},
-	"keywords": [],
-	"license": "0-BSD",
+	"keywords": [
+		"obsidian",
+		"obsidian-plugin",
+		"productivity",
+		"life-management",
+		"hobby-management"
+	],
+	"license": "GPL-3.0-only",
 	"devDependencies": {
 		"@eslint/js": "^9.39.4",
 		"@types/node": "^22.15.17",
