@@ -94,8 +94,127 @@ export const FAKE_HOBBIES = {
 		target: 60,
 		color: '#06B6D4',
 	},
-};
 
+	'hobby-archery': {
+		name: 'Archery',
+		createdAt: '2026-04-10T08:00:00',
+		updatedAt: '2026-10-15T08:00:00',
+		parentId: null,
+		description: 'Practicing aim, posture, and shooting technique',
+		unit_name: "shots",
+		unit_type: "count",
+		target: 30,
+		color: '#A855F7',
+	},
+
+	'hobby-cooking': {
+		name: 'Cooking',
+		createdAt: '2026-04-15T11:00:00',
+		updatedAt: '2026-10-18T11:00:00',
+		parentId: null,
+		description: 'Learning recipes and improving cooking skills',
+		unit_name: "dishes",
+		unit_type: "count",
+		target: 1,
+		color: '#F97316',
+	},
+
+	'hobby-meditation': {
+		name: 'Meditation',
+		createdAt: '2026-05-01T07:00:00',
+		updatedAt: '2026-10-20T07:00:00',
+		parentId: null,
+		description: 'Mindfulness and breathing exercises',
+		unit_name: "minutes",
+		unit_type: "duration",
+		target: 10,
+		color: '#14B8A6',
+	},
+
+	'hobby-photography': {
+		name: 'Photography',
+		createdAt: '2026-05-05T16:00:00',
+		updatedAt: '2026-10-12T16:00:00',
+		parentId: null,
+		description: 'Practicing composition and capturing photographs',
+		unit_name: "photos",
+		unit_type: "count",
+		target: 5,
+		color: '#64748B',
+	},
+
+	'hobby-language': {
+		name: 'Japanese Learning',
+		createdAt: '2026-05-10T09:00:00',
+		updatedAt: '2026-10-22T09:00:00',
+		parentId: null,
+		description: 'Learning Japanese vocabulary and grammar',
+		unit_name: "words",
+		unit_type: "count",
+		target: 10,
+		color: '#E11D48',
+	},
+
+	'hobby-yoga': {
+		name: 'Yoga',
+		createdAt: '2026-06-01T07:00:00',
+		updatedAt: '2026-10-19T07:00:00',
+		parentId: null,
+		description: 'Practicing flexibility and balance',
+		unit_name: "minutes",
+		unit_type: "duration",
+		target: 20,
+		color: '#84CC16',
+	},
+
+	'hobby-writing': {
+		name: 'Creative Writing',
+		createdAt: '2026-06-05T20:00:00',
+		updatedAt: '2026-10-17T20:00:00',
+		parentId: null,
+		description: 'Writing stories, journals, and personal notes',
+		unit_name: "words",
+		unit_type: "count",
+		target: 200,
+		color: '#D946EF',
+	},
+
+	'hobby-clay': {
+		name: 'Clay Modelling',
+		createdAt: '2026-07-01T15:00:00',
+		updatedAt: '2026-10-14T15:00:00',
+		parentId: null,
+		description: 'Creating small sculptures and clay crafts',
+		unit_name: "minutes",
+		unit_type: "duration",
+		target: 30,
+		color: '#B45309',
+	},
+
+	'hobby-cycling': {
+		name: 'Cycling',
+		createdAt: '2026-07-10T06:00:00',
+		updatedAt: '2026-10-21T06:00:00',
+		parentId: null,
+		description: 'Cycling for endurance and fitness',
+		unit_name: "kilometers",
+		unit_type: "count",
+		target: 5,
+		color: '#0EA5E9',
+	},
+
+	'hobby-music': {
+		name: 'Music Practice',
+		createdAt: '2026-08-01T18:00:00',
+		updatedAt: '2026-10-23T18:00:00',
+		parentId: null,
+		description: 'Listening to and studying music',
+		unit_name: "minutes",
+		unit_type: "duration",
+		target: 30,
+		color: '#DB2777',
+	},
+};
 
 /**
  * Hobby Planner

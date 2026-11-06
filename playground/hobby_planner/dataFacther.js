@@ -143,85 +143,155 @@ export function getHobbyIdFilterByPlanner(plannerData, activityData = null) {
  * Provides a centralized interface for retrieving and managing
  * hobby-related data.
  *
- * Exposes methods to access individual hobbies, retrieve their
- * child hobbies, and fetch the complete hobby collection.
+ * Maintains an internal cache of parent-child relationships to
+ * make child hobby lookups more efficient.
  *
  * All returned data is provided as independent copies to prevent
  * accidental modifications to the original data source.
  *
  * Responsibilities:
  * - Retrieve an individual hobby by its ID.
+ * - Retrieve an individual hobby with its children.
+ * - Retrieve all hobbies.
+ * - Retrieve all hobbies with children nested under their parents.
  * - Retrieve all direct child hobbies belonging to a parent hobby.
- * - Retrieve the complete collection of hobbies.
- * - Provide a consistent interface for accessing hobby data.
+ * - Maintain an internal cache for parent-child lookups.
  *
  * Public methods:
- * - `get(hobbyid)`:
- *   Retrieves a single hobby by its ID.
+ *
+ * - `get(hobbyid, child)`:
+ *   Retrieves an individual hobby by its ID.
+ *   Optionally includes its direct children.
+ *
+ * - `get_all(child)`:
+ *   Retrieves the complete hobby collection.
+ *   Optionally nests child hobbies inside their respective parents.
  *
  * - `get_children(hobbyid)`:
- *   Retrieves all direct children of the specified hobby.
+ *   Retrieves all direct child hobbies belonging to the specified hobby.
  *
- * - `get_all()`:
- *   Retrieves the complete hobby collection.
+ * Internal properties:
+ *
+ * - `#childrenCache`:
+ *   Stores parent-child relationships using hobby IDs.
+ *   Built once during initialization and reused for subsequent lookups.
  *
  * Note:
- * Not all planned functionality has been implemented yet.
- *
- * @class HobbyManager
+ * When child inclusion is enabled, child hobbies are returned
+ * inside their parent and are not included as separate top-level entries.
  */
-
 export class HobbyManager {
+    #childrenCache = new Map();
 
     /**
-     * Retrieves the complete collection of hobbies.
+     * Initializes the HobbyManager.
      *
-     * Returns an independent copy of the entire hobby dataset.
+     * Builds an internal lookup cache of parent-child relationships
+     * from the available hobby collection.
      *
-     * @returns {Object}
-     *          An object containing all hobbies, indexed by their IDs.
-     * 
-     * !! does not returnn in chunk yet need implementation
+     * The cache stores child hobby IDs mapped to their respective
+     * parent hobby IDs and is reused by subsequent child lookups.
      */
-    get_all() {
-        return structuredClone(FAKE_HOBBIES);
+    constructor() {
+        // Build parent-child lookup once.
+        for (const [id, hobby] of Object.entries(FAKE_HOBBIES)) {
+            if (!this.#childrenCache.has(hobby.parentId)) {
+                this.#childrenCache.set(hobby.parentId, []);
+            }
+
+            if (hobby.parentId !== null) {
+                this.#childrenCache.get(hobby.parentId).push(id);
+            }
+        }
     }
 
     /**
      * Retrieves an individual hobby by its ID.
      *
-     * @param {number|string} hobbyid
+     * Optionally includes all direct child hobbies belonging to it.
+     *
+     * @param {string} hobbyid
      *        Unique identifier of the requested hobby.
+     *
+     * @param {boolean} [child=false]
+     *        Whether to include the hobby's direct children.
      *
      * @returns {Object|null}
      *          An independent copy of the hobby data,
-     *          or null if the hobby does not exist.
+     *          optionally containing a `children` property.
+     *          Returns null if the hobby does not exist.
      */
-    get(hobbyid) {
-        const result = FAKE_HOBBIES[hobbyid];
-        return result ? structuredClone(result) : null;
+    get(hobbyid, child = false) {
+        const hobby = FAKE_HOBBIES[hobbyid];
+
+        if (!hobby) return null;
+
+        const result = structuredClone(hobby);
+
+        if (child) {
+            result.children = this.get_children(hobbyid);
+        }
+
+        return result;
+    }
+
+    /**
+     * Retrieves the complete collection of hobbies.
+     *
+     * Optionally nests direct child hobbies inside their respective
+     * parent hobbies.
+     *
+     * When child inclusion is enabled, only root-level hobbies
+     * are returned as top-level entries.
+     *
+     * @param {boolean} [child=false]
+     *        Whether to include child hobbies nested inside their parents.
+     *
+     * @returns {Object}
+     *          An object containing hobbies indexed by their IDs.
+     *          When child is enabled, each root hobby contains a
+     *          `children` property with its direct child hobbies.
+     */
+    get_all(child = false) {
+        const result = {};
+
+        for (const [id, hobby] of Object.entries(FAKE_HOBBIES)) {
+            // Skip child hobbies as top-level entries when nesting is enabled.
+            if (child && hobby.parentId !== null) continue;
+
+            result[id] = structuredClone(hobby);
+
+            if (child) {
+                result[id].children = this.get_children(id);
+            }
+        }
+
+        return result;
     }
 
     /**
      * Retrieves all direct child hobbies belonging to a parent hobby.
      *
-     * Matches hobbies whose parentId corresponds to the supplied
-     * hobby ID.
+     * Uses the internal parent-child lookup cache to find matching
+     * hobby IDs without scanning the entire hobby collection.
      *
-     * @param {number|string} hobbyid
-     *        ID of the parent hobby.
+     * @param {string} hobbyid
+     *        Unique identifier of the parent hobby.
      *
      * @returns {Object}
      *          An object containing matching child hobbies,
-     *          indexed by their IDs. Returns an empty object
-     *          if no children are found.
+     *          indexed by their IDs.
+     *          Returns an empty object if no children are found.
      */
     get_children(hobbyid) {
-        return Object.fromEntries(
-            Object.entries(FAKE_HOBBIES)
-                .filter(([_, data]) => data.parentId === hobbyid)
-                .map(([id, data]) => [id, structuredClone(data)])
-        );
+        const childIds = this.#childrenCache.get(hobbyid) ?? [];
+        const result = {};
+
+        for (const id of childIds) {
+            result[id] = structuredClone(FAKE_HOBBIES[id]);
+        }
+
+        return result;
     }
 }
 
