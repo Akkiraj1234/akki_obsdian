@@ -48,8 +48,13 @@ body {
 }
 
 .app-shell {
+	display: flex;
+	flex-direction: column;
+	gap: 40px;
 	width: min(100%, 1500px);
 	margin: 0 auto;
+	padding: 20px;
+	box-sizing: border-box;
 }
 
 @media (max-width: 600px) {
