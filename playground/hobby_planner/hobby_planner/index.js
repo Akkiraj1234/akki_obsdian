@@ -881,4 +881,9 @@ class HobbyPlannerElement extends HTMLElement {
 	}
 }
 
-customElements.define("hobby-planner", HobbyPlannerElement);
+export function main(element) {
+	customElements.define("hobby-planner", HobbyPlannerElement);
+	element.append(
+		document.createElement("hobby-planner")
+	)
+}
