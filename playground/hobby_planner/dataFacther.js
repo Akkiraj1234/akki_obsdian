@@ -193,15 +193,28 @@ export class HobbyManager {
      * parent hobby IDs and is reused by subsequent child lookups.
      */
     constructor() {
-        // Build parent-child lookup once.
+        const pending = {};
+
         for (const [id, hobby] of Object.entries(FAKE_HOBBIES)) {
-            if (!this.#childrenCache.has(hobby.parentId)) {
-                this.#childrenCache.set(hobby.parentId, []);
+            if (hobby.parentId === null) {
+                if (!this.#childrenCache.has(id)) {
+                    this.#childrenCache.set(id, []);
+                }
+                continue;
             }
 
-            if (hobby.parentId !== null) {
+            if (this.#childrenCache.has(hobby.parentId)) {
                 this.#childrenCache.get(hobby.parentId).push(id);
+            } else {
+                (pending[hobby.parentId] ??= []).push(id);
             }
+        }
+
+        for (const [parentId, children] of Object.entries(pending)) {
+            if (!this.#childrenCache.has(parentId)) {
+                this.#childrenCache.set(parentId, []);
+            }
+            this.#childrenCache.get(parentId).push(...children);
         }
     }
 
